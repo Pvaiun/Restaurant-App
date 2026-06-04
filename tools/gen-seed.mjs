@@ -211,6 +211,26 @@ const CUISINE = {
 
 const PAREN_CITY = { Ottawa: "Ottawa", Vancouver: "Vancouver", Victoria: "Victoria, BC" };
 
+// Collapse the fine-grained cuisines above into a small set of broad
+// country-of-origin buckets (plus Brunch). Anything not listed maps to itself.
+const BROAD = {
+  "Québécois": "French",
+  "Brewpub": "French",
+  "Lebanese": "Middle Eastern",
+  "Mediterranean": "Middle Eastern",
+  "Greek": "Middle Eastern",
+  "Haitian": "Caribbean",
+  "Café & Brunch": "Brunch",
+  "Diner": "Brunch",
+  "Canadian": "Canadian & Comfort",
+  "Seafood": "Canadian & Comfort",
+  "Comfort Food": "Canadian & Comfort",
+  "Burgers": "Canadian & Comfort",
+  "British Pub": "Canadian & Comfort",
+  "Vegetarian": "Canadian & Comfort",
+};
+const broaden = (c) => BROAD[c] || c;
+
 function parse(raw) {
   const out = [];
   let city = "Montreal";
@@ -263,7 +283,7 @@ function parse(raw) {
     out.push({
       id: "r" + String(++order).padStart(3, "0"),
       name,
-      cuisine: CUISINE[name] || "Other",
+      cuisine: broaden(CUISINE[name] || "Other"),
       city: rowCity,
       comment,
       visits: visitObjs,

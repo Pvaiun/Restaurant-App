@@ -18,7 +18,7 @@ export const SEED = [
   {
     "id": "r002",
     "name": "Picks",
-    "cuisine": "Canadian",
+    "cuisine": "Canadian & Comfort",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -93,7 +93,7 @@ export const SEED = [
   {
     "id": "r007",
     "name": "Le P'tit Rustik",
-    "cuisine": "Québécois",
+    "cuisine": "French",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -128,7 +128,7 @@ export const SEED = [
   {
     "id": "r009",
     "name": "Dandy",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -143,7 +143,7 @@ export const SEED = [
   {
     "id": "r010",
     "name": "Le Toaster",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -173,7 +173,7 @@ export const SEED = [
   {
     "id": "r012",
     "name": "Muru Crêpes",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -203,7 +203,7 @@ export const SEED = [
   {
     "id": "r014",
     "name": "L'Gros Luxe",
-    "cuisine": "Comfort Food",
+    "cuisine": "Canadian & Comfort",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -248,7 +248,7 @@ export const SEED = [
   {
     "id": "r017",
     "name": "Resto Végo",
-    "cuisine": "Vegetarian",
+    "cuisine": "Canadian & Comfort",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -278,7 +278,7 @@ export const SEED = [
   {
     "id": "r019",
     "name": "3 Brasseurs",
-    "cuisine": "Brewpub",
+    "cuisine": "French",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -353,7 +353,7 @@ export const SEED = [
   {
     "id": "r024",
     "name": "Omnivore",
-    "cuisine": "Lebanese",
+    "cuisine": "Middle Eastern",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -413,7 +413,7 @@ export const SEED = [
   {
     "id": "r028",
     "name": "Nos The",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -443,7 +443,7 @@ export const SEED = [
   {
     "id": "r030",
     "name": "Bvrger",
-    "cuisine": "Burgers",
+    "cuisine": "Canadian & Comfort",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -458,7 +458,7 @@ export const SEED = [
   {
     "id": "r031",
     "name": "Mimosa café",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -503,7 +503,7 @@ export const SEED = [
   {
     "id": "r034",
     "name": "Sunny Dinette",
-    "cuisine": "Diner",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -533,7 +533,7 @@ export const SEED = [
   {
     "id": "r036",
     "name": "Ches's",
-    "cuisine": "Seafood",
+    "cuisine": "Canadian & Comfort",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -563,7 +563,7 @@ export const SEED = [
   {
     "id": "r038",
     "name": "Mallard Cottage",
-    "cuisine": "Canadian",
+    "cuisine": "Canadian & Comfort",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -578,7 +578,7 @@ export const SEED = [
   {
     "id": "r039",
     "name": "Bazar Café",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -683,7 +683,7 @@ export const SEED = [
   {
     "id": "r046",
     "name": "Au Pain Perdu",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -698,7 +698,7 @@ export const SEED = [
   {
     "id": "r047",
     "name": "Burgundy Lion",
-    "cuisine": "British Pub",
+    "cuisine": "Canadian & Comfort",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -728,7 +728,7 @@ export const SEED = [
   {
     "id": "r049",
     "name": "Bagel etc",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -758,7 +758,7 @@ export const SEED = [
   {
     "id": "r051",
     "name": "JAM Cafe",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Vancouver",
     "comment": "",
     "visits": [
@@ -773,7 +773,7 @@ export const SEED = [
   {
     "id": "r052",
     "name": "Bvrger Fiancé",
-    "cuisine": "Burgers",
+    "cuisine": "Canadian & Comfort",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -878,7 +878,7 @@ export const SEED = [
   {
     "id": "r059",
     "name": "Greenspot",
-    "cuisine": "Diner",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -923,7 +923,7 @@ export const SEED = [
   {
     "id": "r062",
     "name": "L'Oeufrier",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -938,7 +938,7 @@ export const SEED = [
   {
     "id": "r063",
     "name": "Lulu Épicerie",
-    "cuisine": "Mediterranean",
+    "cuisine": "Middle Eastern",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -983,7 +983,7 @@ export const SEED = [
   {
     "id": "r066",
     "name": "Foeigwa Brunch",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -998,7 +998,7 @@ export const SEED = [
   {
     "id": "r067",
     "name": "Quoi de neuf",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -1028,7 +1028,7 @@ export const SEED = [
   {
     "id": "r069",
     "name": "Zak's",
-    "cuisine": "Diner",
+    "cuisine": "Brunch",
     "city": "Ottawa",
     "comment": "",
     "visits": [
@@ -1043,7 +1043,7 @@ export const SEED = [
   {
     "id": "r070",
     "name": "Garden Room",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -1073,7 +1073,7 @@ export const SEED = [
   {
     "id": "r072",
     "name": "Souvlaki Grec Plus",
-    "cuisine": "Greek",
+    "cuisine": "Middle Eastern",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -1118,7 +1118,7 @@ export const SEED = [
   {
     "id": "r075",
     "name": "Joyo Burger Wellington",
-    "cuisine": "Burgers",
+    "cuisine": "Canadian & Comfort",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -1133,7 +1133,7 @@ export const SEED = [
   {
     "id": "r076",
     "name": "The Sparrow",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -1178,7 +1178,7 @@ export const SEED = [
   {
     "id": "r079",
     "name": "Millmans",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -1208,7 +1208,7 @@ export const SEED = [
   {
     "id": "r081",
     "name": "The Big R",
-    "cuisine": "Diner",
+    "cuisine": "Brunch",
     "city": "Newfoundland",
     "comment": "",
     "visits": [
@@ -1223,7 +1223,7 @@ export const SEED = [
   {
     "id": "r082",
     "name": "Dock Marina",
-    "cuisine": "Seafood",
+    "cuisine": "Canadian & Comfort",
     "city": "Newfoundland",
     "comment": "",
     "visits": [
@@ -1238,7 +1238,7 @@ export const SEED = [
   {
     "id": "r083",
     "name": "Skippers",
-    "cuisine": "Seafood",
+    "cuisine": "Canadian & Comfort",
     "city": "Newfoundland",
     "comment": "",
     "visits": [
@@ -1253,7 +1253,7 @@ export const SEED = [
   {
     "id": "r084",
     "name": "Lovely Grand",
-    "cuisine": "Canadian",
+    "cuisine": "Canadian & Comfort",
     "city": "Newfoundland",
     "comment": "",
     "visits": [
@@ -1268,7 +1268,7 @@ export const SEED = [
   {
     "id": "r085",
     "name": "Quintal Cafe",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Newfoundland",
     "comment": "",
     "visits": [
@@ -1283,7 +1283,7 @@ export const SEED = [
   {
     "id": "r086",
     "name": "Annie's in Twillingate",
-    "cuisine": "Seafood",
+    "cuisine": "Canadian & Comfort",
     "city": "Newfoundland",
     "comment": "",
     "visits": [
@@ -1298,7 +1298,7 @@ export const SEED = [
   {
     "id": "r087",
     "name": "Ma Poule Mouillée",
-    "cuisine": "Haitian",
+    "cuisine": "Caribbean",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -1358,7 +1358,7 @@ export const SEED = [
   {
     "id": "r091",
     "name": "3 Madames",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [
@@ -1418,7 +1418,7 @@ export const SEED = [
   {
     "id": "r095",
     "name": "Cora",
-    "cuisine": "Café & Brunch",
+    "cuisine": "Brunch",
     "city": "Montreal",
     "comment": "",
     "visits": [

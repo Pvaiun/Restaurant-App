@@ -18,7 +18,7 @@
         <h1>Kayla &amp; Paul</h1>
         <p class="tagline">Places we've eaten</p>
       </div>
-      <button id="addBtn" class="btn btn-accent">Add a place</button>
+      <button id="addBtn" class="btn btn-accent">Add</button>
     </div>
   </header>
 
@@ -46,6 +46,16 @@
     <span id="syncBadge" class="sync-badge"></span>
   </footer>
 
+  <!-- Detail view (tap a row) -->
+  <dialog id="detail" class="sheet">
+    <button type="button" class="x sheet-x" id="closeDetail" aria-label="Close">✕</button>
+    <div class="sheet-body" id="detailBody"></div>
+    <footer class="sheet-foot">
+      <a id="detailMap" class="btn btn-accent" target="_blank" rel="noopener">Open in Maps ↗</a>
+      <button type="button" class="btn btn-quiet" id="detailEdit">Edit</button>
+    </footer>
+  </dialog>
+
   <!-- Add / edit dialog -->
   <dialog id="editor" class="editor">
     <form id="editorForm" method="dialog">
@@ -62,7 +72,7 @@
 
         <div class="field-row">
           <label class="field">
-            <span class="field-label">Type of food</span>
+            <span class="field-label">Cuisine</span>
             <input id="f-cuisine" list="cuisineList" placeholder="e.g. Japanese" />
             <datalist id="cuisineList"></datalist>
           </label>
