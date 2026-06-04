@@ -94,6 +94,37 @@ export async function ensureReady(db) {
     );
     if (stmts.length) await db.batch(stmts);
   }
+
+  await db.prepare("CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT)").run();
+  await backfillDates(db);
+}
+
+// One-time: copy the SEED's placeholder visit dates onto any existing rows whose
+// visits still have no dates (older data seeded before dates existed).
+async function backfillDates(db) {
+  const done = await db.prepare("SELECT v FROM meta WHERE k = 'placeholder_dates'").first();
+  if (done) return;
+
+  const seedById = {};
+  for (const s of SEED) seedById[s.id] = s;
+  const { results } = await db.prepare("SELECT id, visits FROM restaurants").all();
+  const stmts = [];
+  for (const row of results || []) {
+    const seed = seedById[row.id];
+    if (!seed) continue;
+    let visits;
+    try { visits = JSON.parse(row.visits || "[]"); } catch (e) { continue; }
+    let changed = false;
+    visits.forEach((v, i) => {
+      if ((!v.date || v.date === "") && seed.visits[i] && seed.visits[i].date) {
+        v.date = seed.visits[i].date;
+        changed = true;
+      }
+    });
+    if (changed) stmts.push(db.prepare("UPDATE restaurants SET visits = ? WHERE id = ?").bind(JSON.stringify(visits), row.id));
+  }
+  if (stmts.length) await db.batch(stmts);
+  await db.prepare("INSERT OR REPLACE INTO meta (k, v) VALUES ('placeholder_dates', '1')").run();
 }
 
 export async function upsert(db, r) {

@@ -32,6 +32,8 @@
     items: [],
     cuisines: [],
     mode: "loading",
+    view: "places",                     // "places" | "insights"
+    cuisineMetric: "both",              // insights cuisine ranking: both | k | p
     search: "",
     sort: { key: "date", dir: "desc" }, // default: newest
     exCuisine: new Set(),               // excluded cuisines (empty = all shown)
@@ -167,7 +169,19 @@
     else { badge.textContent = "Saved on this device"; badge.className = "sync-badge"; badge.title = "Connect the Cloudflare database to sync across devices"; }
     updateSortUI();
     updateFilterBadges();
-    render();
+    renderActive();
+  }
+
+  function renderActive() { if (state.view === "insights") renderInsights(); else render(); }
+  function setView(v) {
+    state.view = v;
+    $("#tabPlaces").classList.toggle("active", v === "places");
+    $("#tabInsights").classList.toggle("active", v === "insights");
+    $(".controls").hidden = v !== "places";
+    $("#app").hidden = v !== "places";
+    $("#insights").hidden = v !== "insights";
+    renderActive();
+    window.scrollTo({ top: 0 });
   }
 
   function visibleItems() {
@@ -488,7 +502,7 @@
         saved = saved && saved.id ? saved : item;
         if (isNew) state.items.push(saved);
         else { var i = state.items.findIndex(function (x) { return x.id === saved.id; }); if (i >= 0) state.items[i] = saved; }
-        updateFilterBadges(); render(); closeDialog(dlg);
+        updateFilterBadges(); renderActive(); closeDialog(dlg);
         showToast(isNew ? "Added " + saved.name : "Saved changes");
       })
       .catch(function () { showToast("Couldn't save — try again", true); })
@@ -503,7 +517,7 @@
     removeItem(id)
       .then(function () {
         state.items = state.items.filter(function (x) { return x.id !== id; });
-        updateFilterBadges(); render(); closeDialog(dlg);
+        updateFilterBadges(); renderActive(); closeDialog(dlg);
         showToast("Deleted " + r.name);
       })
       .catch(function () { showToast("Couldn't delete — try again", true); });
@@ -516,6 +530,224 @@
   function showToast(msg, isErr) {
     var t = $("#toast"); t.textContent = msg; t.className = "toast show" + (isErr ? " error" : "");
     clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.className = "toast"; }, 2600);
+  }
+
+  /* ---------------- insights ---------------- */
+  function visitScores(r, who) { return (r.visits || []).map(function (v) { return v[who]; }).filter(function (x) { return x != null; }); }
+  function mean(a) { return a.length ? a.reduce(function (x, y) { return x + y; }, 0) / a.length : null; }
+  function rMean(r, who) {
+    if (who === "both") return mean(visitScores(r, "k").concat(visitScores(r, "p")));
+    return mean(visitScores(r, who));
+  }
+  function lastKP(r) { var v = latestVisit(r); return { k: v ? v.k : null, p: v ? v.p : null }; }
+  function round1(n) { return n == null ? "–" : (Math.round(n * 10) / 10).toFixed(1); }
+
+  function barChart(rows, max, fmtVal) {
+    var wrap = el("div", "bars");
+    rows.forEach(function (row) {
+      var r = el("div", "bar-row");
+      var lab = el("div", "bar-label");
+      lab.appendChild(document.createTextNode(row.label));
+      if (row.sub) lab.appendChild(el("small", null, " " + row.sub));
+      r.appendChild(lab);
+      var track = el("div", "bar-track");
+      var fill = el("div", "bar-fill" + (row.alt ? " alt" : ""));
+      fill.style.width = Math.max(0, (row.value / max) * 100) + "%";
+      track.appendChild(fill);
+      r.appendChild(track);
+      r.appendChild(el("div", "bar-val", fmtVal ? fmtVal(row.value) : String(row.value)));
+      wrap.appendChild(r);
+    });
+    return wrap;
+  }
+  function card(title, subtitle, node, headExtra) {
+    var c = el("div", "insight");
+    var h = el("div", "insight-head");
+    h.appendChild(el("h3", null, title));
+    if (headExtra) h.appendChild(headExtra);
+    c.appendChild(h);
+    if (subtitle) c.appendChild(el("p", "sub tight", subtitle));
+    c.appendChild(node);
+    return c;
+  }
+  function rankList(entries) {
+    // entries: { name, sub, right (string|node) }
+    var box = el("div", "rank");
+    entries.forEach(function (e) {
+      var row = el("div", "rank-row");
+      var nm = el("div", "rank-name");
+      nm.appendChild(el("b", null, e.name));
+      if (e.sub) nm.appendChild(el("span", null, e.sub));
+      row.appendChild(nm);
+      if (typeof e.right === "string") row.appendChild(el("div", "rank-score", e.right));
+      else if (e.right) row.appendChild(e.right);
+      box.appendChild(row);
+    });
+    return box;
+  }
+  function kpPair(k, p) {
+    var s = el("div", "kp-pair");
+    s.appendChild(document.createTextNode(fmt(k)));
+    s.appendChild(el("span", "sep", "·"));
+    s.appendChild(document.createTextNode(fmt(p)));
+    return s;
+  }
+  function favouriteCuisine(who) {
+    var rows = cuisineRankRows(who).filter(function (x) { return x.n >= 2; });
+    return rows.length ? rows[0].label : "—";
+  }
+  function cuisineRankRows(metric) {
+    var groups = {};
+    state.items.forEach(function (r) {
+      var m = rMean(r, metric); if (m == null) return;
+      var c = categoryOf(r); (groups[c] || (groups[c] = [])).push(m);
+    });
+    return Object.keys(groups).map(function (c) {
+      return { label: c, sub: "(" + groups[c].length + ")", n: groups[c].length, value: mean(groups[c]) };
+    }).sort(function (a, b) { return b.value - a.value; });
+  }
+
+  function metricToggle() {
+    var seg = el("div", "seg");
+    [["both", "Combined"], ["k", "Kayla"], ["p", "Paul"]].forEach(function (p) {
+      var b = el("button", state.cuisineMetric === p[0] ? "on" : null, p[1]); b.type = "button";
+      b.addEventListener("click", function () { state.cuisineMetric = p[0]; renderInsights(); });
+      seg.appendChild(b);
+    });
+    return seg;
+  }
+
+  function renderInsights() {
+    var box = $("#insights");
+    box.innerHTML = "";
+    var items = state.items;
+    if (!items.length) { box.appendChild(el("p", "empty-state", "Add some places to see insights.")); return; }
+
+    var allK = [], allP = [];
+    items.forEach(function (r) { allK = allK.concat(visitScores(r, "k")); allP = allP.concat(visitScores(r, "p")); });
+    var totalVisits = items.reduce(function (n, r) { return n + (r.visits ? r.visits.length : 0); }, 0);
+    var meanK = mean(allK), meanP = mean(allP);
+    var mutual = items.filter(function (r) { var l = lastKP(r); return l.k != null && l.p != null && l.k >= 9 && l.p >= 9; });
+
+    // --- headline tiles ---
+    var tiles = el("div", "tiles");
+    function tile(num, sub, small) {
+      var t = el("div", "tile");
+      var n = el("div", "tile-num"); n.appendChild(document.createTextNode(num));
+      if (small) n.appendChild(el("small", null, " " + small));
+      t.appendChild(n); t.appendChild(el("div", "tile-label", sub));
+      return t;
+    }
+    tiles.appendChild(tile(String(items.length), "places eaten"));
+    tiles.appendChild(tile(String(totalVisits), "total visits"));
+    tiles.appendChild(tile(String(Object.keys(cuisineCounts()).length), "cuisines"));
+    tiles.appendChild(tile(String(Object.keys(cityCounts()).length), "cities & areas"));
+    tiles.appendChild(tile(round1(mean(allK.concat(allP))), "average score", "/10"));
+    tiles.appendChild(tile(String(mutual.length), "mutual 9+ faves"));
+    box.appendChild(tiles);
+
+    // --- tougher critic ---
+    var harsher = meanK == null || meanP == null ? null : (meanK < meanP ? "Kayla" : (meanP < meanK ? "Paul" : null));
+    var kHigh = 0, pHigh = 0, ties = 0, gaps = [];
+    items.forEach(function (r) {
+      var l = lastKP(r); if (l.k == null || l.p == null) return;
+      gaps.push(Math.abs(l.k - l.p));
+      if (l.k > l.p) kHigh++; else if (l.p > l.k) pHigh++; else ties++;
+    });
+    var criticSub = harsher
+      ? harsher + " is the tougher critic — by " + round1(Math.abs(meanK - meanP)) + " points on average."
+      : "You're equally tough on average!";
+    box.appendChild(card("Who's the tougher critic?", criticSub,
+      barChart([
+        { label: "Kayla", value: meanK || 0 },
+        { label: "Paul", value: meanP || 0, alt: true },
+      ], 10, round1)));
+
+    // --- cuisine ranking (toggle) ---
+    var metricName = state.cuisineMetric === "both" ? "Combined" : (state.cuisineMetric === "k" ? "Kayla's" : "Paul's");
+    var crRows = cuisineRankRows(state.cuisineMetric).map(function (x) { return { label: x.label, sub: x.sub, value: x.value }; });
+    box.appendChild(card("Best cuisines", metricName + " average rating per cuisine (count in brackets)",
+      barChart(crRows, 10, round1), metricToggle()));
+
+    // --- count by cuisine ---
+    var cc = cuisineCounts();
+    var countRows = Object.keys(cc).map(function (c) { return { label: c, value: cc[c] }; }).sort(function (a, b) { return b.value - a.value; });
+    box.appendChild(card("Most-explored cuisines", "How many places of each kind you've tried",
+      barChart(countRows, Math.max.apply(null, countRows.map(function (r) { return r.value; })))));
+
+    // --- hall of fame / shame ---
+    var scored = items.map(function (r) { return { r: r, v: rMean(r, "both"), last: lastKP(r) }; }).filter(function (x) { return x.v != null; });
+    var fame = scored.slice().sort(function (a, b) { return b.v - a.v; }).slice(0, 5);
+    var shame = scored.slice().sort(function (a, b) { return a.v - b.v; }).slice(0, 5);
+    var twoUp = el("div", "two-up");
+    twoUp.appendChild(card("🏆 Hall of fame", "Your highest rated", rankList(fame.map(function (x) {
+      return { name: x.r.name, sub: categoryOf(x.r), right: el("div", "rank-score", round1(x.v)) };
+    }))));
+    twoUp.appendChild(card("💀 Hall of shame", "Best avoided", rankList(shame.map(function (x) {
+      return { name: x.r.name, sub: categoryOf(x.r), right: el("div", "rank-score", round1(x.v)) };
+    }))));
+    box.appendChild(twoUp);
+
+    // --- biggest disagreements ---
+    var dis = items.map(function (r) { var l = lastKP(r); if (l.k == null || l.p == null) return null; return { r: r, l: l, gap: Math.abs(l.k - l.p) }; })
+      .filter(Boolean).sort(function (a, b) { return b.gap - a.gap; }).slice(0, 6);
+    box.appendChild(card("Biggest disagreements", "Where your scores were furthest apart",
+      rankList(dis.map(function (x) {
+        var who = x.l.k > x.l.p ? "Kayla preferred" : "Paul preferred";
+        var right = el("div", "rank-score");
+        right.appendChild(el("span", "rank-gap", "Δ " + fmt(x.gap)));
+        return { name: x.r.name, sub: who + " · " + fmt(x.l.k) + " vs " + fmt(x.l.p), right: right };
+      }))));
+
+    // --- agreement ---
+    var agreeSub = "You gave the exact same score at " + ties + " place" + (ties === 1 ? "" : "s") +
+      " · average gap is " + round1(mean(gaps)) + " points.";
+    box.appendChild(card("How often you agree", agreeSub,
+      barChart([
+        { label: "Same score", value: ties },
+        { label: "Kayla higher", value: kHigh },
+        { label: "Paul higher", value: pHigh, alt: true },
+      ], Math.max(ties, kHigh, pHigh) || 1)));
+
+    // --- mutual favourites ---
+    if (mutual.length) {
+      box.appendChild(card("💞 Mutual favourites", "Both of you rated these 9 or above",
+        rankList(mutual.sort(function (a, b) { return rMean(b, "both") - rMean(a, "both"); }).map(function (r) {
+          var l = lastKP(r);
+          return { name: r.name, sub: categoryOf(r), right: kpPair(l.k, l.p) };
+        }))));
+    }
+
+    // --- cities ---
+    var byCity = {};
+    items.forEach(function (r) {
+      var c = cityOf(r); var m = rMean(r, "both");
+      if (!byCity[c]) byCity[c] = { n: 0, s: [] };
+      byCity[c].n++; if (m != null) byCity[c].s.push(m);
+    });
+    var cityRows = Object.keys(byCity).map(function (c) { return { city: c, n: byCity[c].n, avg: mean(byCity[c].s) }; })
+      .sort(function (a, b) { return b.n - a.n; });
+    box.appendChild(card("Where you've eaten", "Places per city or area, with average rating",
+      rankList(cityRows.map(function (x) {
+        return { name: x.city, sub: x.n + " place" + (x.n === 1 ? "" : "s"), right: el("div", "rank-score", "avg " + round1(x.avg)) };
+      }))));
+
+    // --- score distribution ---
+    var bins = [{ l: "Under 5", lo: 0, hi: 5 }, { l: "5–6", lo: 5, hi: 6 }, { l: "6–7", lo: 6, hi: 7 },
+      { l: "7–8", lo: 7, hi: 8 }, { l: "8–9", lo: 8, hi: 9 }, { l: "9–10", lo: 9, hi: 10.01 }];
+    var allScores = allK.concat(allP);
+    var distRows = bins.map(function (b) {
+      return { label: b.l, value: allScores.filter(function (s) { return s >= b.lo && s < b.hi; }).length };
+    });
+    box.appendChild(card("Score distribution", "Every rating you've both ever given (" + allScores.length + " total)",
+      barChart(distRows, Math.max.apply(null, distRows.map(function (r) { return r.value; })) || 1)));
+
+    // --- footnote on personalities ---
+    var foot = el("p", "sub");
+    foot.style.textAlign = "center";
+    foot.style.color = "var(--ink-faint)";
+    foot.textContent = "Kayla's happy place: " + favouriteCuisine("k") + "  ·  Paul's happy place: " + favouriteCuisine("p");
+    box.appendChild(foot);
   }
 
   /* ---------------- wiring ---------------- */
@@ -551,6 +783,9 @@
     $("#sortName").addEventListener("click", function () { setSort("name"); });
     $("#sortKayla").addEventListener("click", function () { setSort("kayla"); });
     $("#sortPaul").addEventListener("click", function () { setSort("paul"); });
+
+    $("#tabPlaces").addEventListener("click", function () { setView("places"); });
+    $("#tabInsights").addEventListener("click", function () { setView("insights"); });
 
     var s = $("#search"), deb;
     s.addEventListener("input", function () { clearTimeout(deb); deb = setTimeout(function () { state.search = s.value; render(); }, 120); });

@@ -296,6 +296,21 @@ function parse(raw) {
 
 const data = parse(RAW);
 
+// Placeholder visit dates: spread the catalogue across Jan 2023 → Jun 2026 by
+// entry order (roughly chronological), so "Newest" sort and time-based insights
+// have something to work with until real dates are entered.
+const absToYM = (abs) => Math.floor(abs / 12) + "-" + String((abs % 12) + 1).padStart(2, "0");
+const START = 2023 * 12 + 0;   // Jan 2023
+const END = 2026 * 12 + 5;     // Jun 2026
+const SPAN = END - START;
+data.forEach((r, idx) => {
+  const base = START + Math.round((idx / (data.length - 1)) * SPAN);
+  const vc = r.visits.length;
+  r.visits.forEach((v, j) => {
+    v.date = absToYM(Math.max(START, base - (vc - 1 - j) * 8)); // earlier visits ~8 mo before
+  });
+});
+
 // Sanity check: warn on rows missing a cuisine or scores.
 for (const r of data) {
   if (r.cuisine === "Other") console.warn("No cuisine for:", r.name);

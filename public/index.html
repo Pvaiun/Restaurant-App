@@ -25,6 +25,13 @@
     </div>
   </header>
 
+  <nav class="tabs">
+    <div class="wrap tabs-inner">
+      <button id="tabPlaces" class="tab active" type="button">Places</button>
+      <button id="tabInsights" class="tab" type="button">Insights</button>
+    </div>
+  </nav>
+
   <div class="controls">
     <div class="wrap controls-row">
       <input id="search" class="search" type="search" placeholder="Search" autocomplete="off" />
@@ -48,6 +55,8 @@
   <main id="app" class="wrap app">
     <p class="empty-state" id="loading">Loading…</p>
   </main>
+
+  <section id="insights" class="wrap insights" hidden></section>
 
   <footer class="wrap footer">
     <span id="statLine"></span>
