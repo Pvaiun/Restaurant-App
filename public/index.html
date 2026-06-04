@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#b6432f" />
+  <title>K&P Restaurant Catalogue</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">🍽️</span>
+        <div>
+          <h1>Kayla &amp; Paul</h1>
+          <p class="tagline">Restaurants we've visited</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <span id="syncBadge" class="sync-badge" title="Where your data lives">…</span>
+        <button id="addBtn" class="btn btn-primary">+ Add restaurant</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="controls-inner">
+      <input id="search" class="search" type="search" placeholder="Search name, cuisine, city, notes…" autocomplete="off" />
+      <label class="control-field">
+        <span>Group by</span>
+        <select id="groupBy">
+          <option value="cuisine" selected>Cuisine</option>
+          <option value="city">City</option>
+          <option value="none">Nothing (flat list)</option>
+        </select>
+      </label>
+      <label class="control-field">
+        <span>Sort by</span>
+        <select id="sortBy">
+          <option value="avg-desc" selected>Score (high → low)</option>
+          <option value="avg-asc">Score (low → high)</option>
+          <option value="name-asc">Name (A → Z)</option>
+          <option value="recent">Recently added</option>
+        </select>
+      </label>
+      <label class="control-field cuisine-filter">
+        <span>Cuisine</span>
+        <select id="cuisineFilter"><option value="">All</option></select>
+      </label>
+    </div>
+  </div>
+
+  <main id="app" class="app">
+    <p class="empty-state" id="loading">Loading…</p>
+  </main>
+
+  <footer class="footer">
+    <span id="statLine"></span>
+  </footer>
+
+  <!-- Editor dialog -->
+  <dialog id="editor" class="editor">
+    <form id="editorForm" method="dialog">
+      <header class="editor-head">
+        <h2 id="editorTitle">Add restaurant</h2>
+        <button type="button" class="icon-btn" id="closeEditor" aria-label="Close">✕</button>
+      </header>
+
+      <div class="editor-body">
+        <label class="field">
+          <span>Name</span>
+          <input id="f-name" required maxlength="120" placeholder="Restaurant name" />
+        </label>
+
+        <div class="field-row">
+          <label class="field">
+            <span>Cuisine</span>
+            <input id="f-cuisine" list="cuisineList" placeholder="e.g. Japanese" />
+            <datalist id="cuisineList"></datalist>
+          </label>
+          <label class="field">
+            <span>City / area <small>(for maps)</small></span>
+            <input id="f-city" placeholder="Montreal" />
+          </label>
+        </div>
+
+        <fieldset class="visits-fieldset">
+          <legend>Visits &amp; ratings <small>(K = Kayla, P = Paul, out of 10)</small></legend>
+          <div id="visitsList" class="visits-list"></div>
+          <button type="button" class="btn btn-ghost btn-sm" id="addVisitBtn">+ Add another visit</button>
+        </fieldset>
+
+        <label class="field">
+          <span>Comments</span>
+          <textarea id="f-comment" rows="3" maxlength="2000" placeholder="Tasting notes, what to order, who we went with…"></textarea>
+        </label>
+      </div>
+
+      <footer class="editor-foot">
+        <button type="button" class="btn btn-danger-ghost" id="deleteBtn" hidden>Delete</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn btn-ghost" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="saveBtn">Save</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="seed-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+name = "kp-restaurants"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "public"
+
+# Cloudflare D1 database binding. After you create the database with
+#   wrangler d1 create kp-restaurants
+# paste the returned database_id below (and in the Pages dashboard, bind a D1
+# database named "DB" to this project for production).
+[[d1_databases]]
+binding = "DB"
+database_name = "kp-restaurants"
+database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
