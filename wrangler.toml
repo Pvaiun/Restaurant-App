@@ -8,15 +8,9 @@ compatibility_date = "2024-09-23"
 directory = "./public"
 binding = "ASSETS"
 
-# --- Cloud data storage (optional, enables cross-device sync) ---------------
-# Until this is set up, the app still works and saves data in each browser.
-# To turn on Cloudflare-hosted data:
-#   1. Dashboard -> Storage & Databases -> D1 -> Create database "kp-restaurants"
-#      (copy the Database ID it shows you).
-#   2. Uncomment the block below and paste the ID.
-#   3. Commit/push (or redeploy) — the table seeds itself on first load.
-#
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "kp-restaurants"
-# database_id = "PASTE_YOUR_DATABASE_ID_HERE"
+# --- Cloud data storage: synced across devices via Cloudflare D1 -------------
+# The table is created and seeded automatically on first load.
+[[d1_databases]]
+binding = "DB"
+database_name = "kp-restaurants"
+database_id = "d6dc8ffa-5bae-4aa2-a7f0-169f39dd129a"

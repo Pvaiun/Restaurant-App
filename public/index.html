@@ -3,53 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#ffffff" />
-  <title>Kayla &amp; Paul · Places we've eaten</title>
+  <meta name="theme-color" content="#f3ead9" />
+  <title>Kayla &amp; Paul</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍴</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍊</text></svg>" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="topbar">
-    <div class="topbar-inner">
+    <div class="wrap topbar-inner">
       <div class="brand">
-        <span class="brand-mark">🍴</span>
-        <div class="brand-text">
-          <h1>Kayla &amp; Paul</h1>
-          <p class="tagline">Places we've eaten</p>
-        </div>
+        <h1>Kayla &amp; Paul</h1>
+        <p class="tagline">Places we've eaten</p>
       </div>
-      <button id="addBtn" class="btn btn-primary">
-        <span class="plus">+</span> Add a place
-      </button>
+      <button id="addBtn" class="btn btn-accent">Add a place</button>
     </div>
   </header>
 
   <div class="controls">
-    <div class="controls-inner">
-      <div class="search-wrap">
-        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 21l-4.3-4.3M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <input id="search" class="search" type="search" placeholder="Search a place, cuisine or note…" autocomplete="off" />
-      </div>
-      <div class="sort-wrap">
-        <select id="sortBy" class="sort-select" aria-label="Sort by">
-          <option value="avg-desc">★ Top rated</option>
-          <option value="avg-asc">Lowest rated</option>
-          <option value="name-asc">A → Z</option>
-          <option value="recent">Newest</option>
-        </select>
-      </div>
+    <div class="wrap controls-inner">
+      <input id="search" class="search" type="search" placeholder="Search" autocomplete="off" />
+      <select id="sortBy" class="sort" aria-label="Sort by">
+        <option value="avg-desc">Top rated</option>
+        <option value="avg-asc">Lowest rated</option>
+        <option value="name-asc">A–Z</option>
+        <option value="recent">Newest</option>
+      </select>
     </div>
-    <div id="cuisineChips" class="chips-row" role="tablist" aria-label="Filter by cuisine"></div>
+    <div class="wrap">
+      <div id="cuisineChips" class="chips" role="tablist" aria-label="Filter by cuisine"></div>
+    </div>
   </div>
 
-  <main id="app" class="app">
-    <p class="empty-state" id="loading">Loading your places…</p>
+  <main id="app" class="wrap app">
+    <p class="empty-state" id="loading">Loading…</p>
   </main>
 
-  <footer class="footer">
+  <footer class="wrap footer">
     <span id="statLine"></span>
     <span id="syncBadge" class="sync-badge"></span>
   </footer>
@@ -59,7 +51,7 @@
     <form id="editorForm" method="dialog">
       <header class="editor-head">
         <h2 id="editorTitle">Add a place</h2>
-        <button type="button" class="icon-btn" id="closeEditor" aria-label="Close">✕</button>
+        <button type="button" class="x" id="closeEditor" aria-label="Close">✕</button>
       </header>
 
       <div class="editor-body">
@@ -81,29 +73,26 @@
         </div>
 
         <fieldset class="ratings">
-          <legend class="field-label">Ratings <span class="legend-hint">out of 10</span></legend>
+          <legend class="field-label">Ratings <span class="muted">/ 10</span></legend>
           <div class="ratings-head">
-            <span></span>
-            <span class="rh kayla">Kayla</span>
-            <span class="rh paul">Paul</span>
-            <span></span>
+            <span></span><span>Kayla</span><span>Paul</span><span></span>
           </div>
           <div id="visitsList" class="visits-list"></div>
-          <button type="button" class="btn btn-soft btn-sm" id="addVisitBtn">+ Add another visit</button>
-          <p class="ratings-tip">Been back? Add a new visit (with a year) instead of changing the old score — keeps your history.</p>
+          <button type="button" class="btn btn-quiet btn-sm" id="addVisitBtn">+ Add another visit</button>
+          <p class="hint">Been back? Add a new visit (with a year) to keep the old score too.</p>
         </fieldset>
 
         <label class="field">
           <span class="field-label">Notes</span>
-          <textarea id="f-comment" rows="3" maxlength="2000" placeholder="What to order, who you went with, the vibe…"></textarea>
+          <textarea id="f-comment" rows="3" maxlength="2000" placeholder="What to order, the vibe…"></textarea>
         </label>
       </div>
 
       <footer class="editor-foot">
-        <button type="button" class="btn btn-danger-ghost" id="deleteBtn" hidden>Delete</button>
+        <button type="button" class="btn btn-link-danger" id="deleteBtn" hidden>Delete</button>
         <span class="spacer"></span>
-        <button type="button" class="btn btn-soft" id="cancelBtn">Cancel</button>
-        <button type="submit" class="btn btn-primary" id="saveBtn">Save</button>
+        <button type="button" class="btn btn-quiet" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn btn-accent" id="saveBtn">Save</button>
       </footer>
     </form>
   </dialog>

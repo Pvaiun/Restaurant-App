@@ -1,9 +1,8 @@
 /* K&P Restaurant Catalogue — frontend logic.
  *
- * Data layer: talks to the Cloudflare D1-backed API at /api/restaurants when it
- * is reachable. If the API is unavailable (e.g. opened straight from disk, or
- * before you've connected the D1 database), it transparently falls back to the
- * browser's localStorage, seeded from seed-data.js, so the app always works.
+ * Talks to the Cloudflare D1-backed API at /api/restaurants when reachable, and
+ * transparently falls back to localStorage (seeded from seed-data.js) otherwise,
+ * so the app always works.
  */
 (function () {
   "use strict";
@@ -15,11 +14,10 @@
     mode: "loading", // "cloud" | "local"
     search: "",
     sortBy: "avg-desc",
-    cuisine: "", // "" = all (grouped by cuisine); otherwise a single cuisine
+    cuisine: "", // "" = all (grouped by cuisine); otherwise one cuisine
   };
 
   /* ---------------- helpers ---------------- */
-
   function $(sel, root) { return (root || document).querySelector(sel); }
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -34,8 +32,6 @@
     var n = Number(v);
     return isFinite(n) ? n : null;
   }
-
-  // Average of all per-person scores across every visit (the "overall" score).
   function combinedAvg(r) {
     var vals = [];
     (r.visits || []).forEach(function (v) {
@@ -53,20 +49,12 @@
     if (n == null) return "–";
     return Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/0$/, "");
   }
-  function tierClass(avg) {
-    if (avg == null) return "tier-none";
-    if (avg >= 8.5) return "tier-top";
-    if (avg >= 7) return "tier-good";
-    if (avg >= 5.5) return "tier-mid";
-    return "tier-low";
-  }
   function mapsUrl(r) {
     var q = encodeURIComponent([r.name, r.city].filter(Boolean).join(", "));
     return "https://www.google.com/maps/search/?api=1&query=" + q;
   }
 
   /* ---------------- data layer ---------------- */
-
   function loadLocal() {
     try {
       var raw = localStorage.getItem(LS_KEY);
@@ -127,15 +115,14 @@
   }
 
   /* ---------------- rendering ---------------- */
-
   function afterLoad() {
     var badge = $("#syncBadge");
     if (state.mode === "cloud") {
-      badge.textContent = "☁ Synced";
+      badge.textContent = "Synced";
       badge.className = "sync-badge cloud";
-      badge.title = "Saved to your Cloudflare database and shared across devices";
+      badge.title = "Saved to your Cloudflare database, shared across devices";
     } else {
-      badge.textContent = "● Saved on this device";
+      badge.textContent = "Saved on this device";
       badge.className = "sync-badge";
       badge.title = "Connect the Cloudflare database to sync across devices";
     }
@@ -161,7 +148,6 @@
     wrap.appendChild(makeChip("", "All", state.items.length));
     names.forEach(function (c) { wrap.appendChild(makeChip(c, c, counts[c])); });
 
-    // keep the datalist (editor autocomplete) in sync
     var dl = $("#cuisineList");
     dl.innerHTML = "";
     names.forEach(function (c) {
@@ -175,13 +161,11 @@
     var b = el("button", "chip-btn" + (state.cuisine === value ? " active" : ""));
     b.type = "button";
     b.appendChild(document.createTextNode(label));
-    var c = el("span", "chip-count", String(count));
-    b.appendChild(c);
+    b.appendChild(el("span", "cnt", String(count)));
     b.addEventListener("click", function () {
       state.cuisine = state.cuisine === value ? "" : value;
       renderChips();
       render();
-      // scroll the active chip into view
       var active = $("#cuisineChips .chip-btn.active");
       if (active && active.scrollIntoView) active.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
     });
@@ -205,7 +189,7 @@
       case "avg-asc": return safeAvg(a) - safeAvg(b);
       case "name-asc": return a.name.localeCompare(b.name);
       case "recent": return (b.sort || 0) - (a.sort || 0);
-      default: return safeAvg(b) - safeAvg(a); // avg-desc
+      default: return safeAvg(b) - safeAvg(a);
     }
   }
   function safeAvg(r) { var v = combinedAvg(r); return v == null ? -1 : v; }
@@ -219,16 +203,11 @@
       state.items.length + " places · " + Object.keys(cuisineCounts()).length + " cuisines";
 
     if (!items.length) {
-      var empty = el("div", "empty-state");
-      empty.appendChild(el("span", "big", state.items.length ? "🔍" : "🍽️"));
-      empty.appendChild(document.createTextNode(
-        state.items.length ? "Nothing matches that — try another search." : "No places yet. Add your first one!"
-      ));
-      app.appendChild(empty);
+      app.appendChild(el("p", "empty-state",
+        state.items.length ? "Nothing matches that search." : "No places yet — add your first one."));
       return;
     }
 
-    // A specific cuisine selected → flat sorted list. "All" → grouped by cuisine.
     if (state.cuisine) {
       app.appendChild(renderCards(items));
       return;
@@ -245,11 +224,7 @@
       var head = el("div", "group-head");
       head.appendChild(el("h2", "group-title", g));
       head.appendChild(el("span", "group-count", String(rows.length)));
-      var avgs = rows.map(combinedAvg).filter(function (n) { return n != null; });
-      if (avgs.length) {
-        var ga = avgs.reduce(function (a, b) { return a + b; }, 0) / avgs.length;
-        head.appendChild(el("span", "group-avg", "avg " + ga.toFixed(1)));
-      }
+      head.appendChild(el("span", "group-rule"));
       section.appendChild(head);
       section.appendChild(renderCards(rows));
       app.appendChild(section);
@@ -262,37 +237,31 @@
     return grid;
   }
 
-  function whoScore(letter, name, value, cls) {
-    var w = el("div", "who-score " + cls);
-    w.appendChild(el("span", "who-avatar", letter));
-    w.appendChild(el("span", "who-name", name));
-    w.appendChild(el("span", null, fmt(value)));
-    return w;
-  }
-
   function renderCard(r) {
     var card = el("article", "card");
 
-    var top = el("div", "card-top");
-    var main = el("div", "card-main");
-    main.appendChild(el("h3", "card-name", r.name));
-    var meta = el("div", "card-meta");
-    if (r.cuisine) meta.appendChild(el("span", "chip", r.cuisine));
-    if (r.city) meta.appendChild(el("span", "chip city", r.city));
-    main.appendChild(meta);
-    top.appendChild(main);
-
+    var row = el("div", "card-row");
+    row.appendChild(el("h3", "card-name", r.name));
     var avg = combinedAvg(r);
-    var badge = el("div", "score-badge " + tierClass(avg));
-    badge.appendChild(el("div", "score-num", avg == null ? "–" : avg.toFixed(1)));
-    badge.appendChild(el("div", "score-lbl", "overall"));
-    top.appendChild(badge);
-    card.appendChild(top);
+    row.appendChild(el("span", "overall" + (avg == null ? " none" : ""), avg == null ? "–" : avg.toFixed(1)));
+    card.appendChild(row);
+
+    var subParts = [];
+    if (r.cuisine) subParts.push(r.cuisine);
+    if (r.city) subParts.push(r.city);
+    if (subParts.length) {
+      var sub = el("p", "card-sub");
+      subParts.forEach(function (part, i) {
+        if (i) sub.appendChild(el("span", "dot", "·"));
+        sub.appendChild(document.createTextNode(part));
+      });
+      card.appendChild(sub);
+    }
 
     var last = latestVisit(r);
     var scores = el("div", "scores");
-    scores.appendChild(whoScore("K", "Kayla", last ? last.k : null, "k"));
-    scores.appendChild(whoScore("P", "Paul", last ? last.p : null, "p"));
+    scores.appendChild(scoreSpan("Kayla", last ? last.k : null));
+    scores.appendChild(scoreSpan("Paul", last ? last.p : null));
     card.appendChild(scores);
 
     if ((r.visits || []).length > 1) {
@@ -305,11 +274,12 @@
     if (r.comment) card.appendChild(el("p", "card-comment", r.comment));
 
     var actions = el("div", "card-actions");
-    var maps = el("a", "btn btn-maps", "📍 Map");
+    var maps = el("a", "link", "Map ↗");
     maps.href = mapsUrl(r);
     maps.target = "_blank";
     maps.rel = "noopener";
-    var edit = el("button", "btn btn-edit", "✎ Edit");
+    var edit = el("button", "link muted", "Edit");
+    edit.type = "button";
     edit.addEventListener("click", function () { openEditor(r); });
     actions.appendChild(maps);
     actions.appendChild(edit);
@@ -318,8 +288,14 @@
     return card;
   }
 
-  /* ---------------- editor ---------------- */
+  function scoreSpan(name, value) {
+    var s = el("span", "sc");
+    s.appendChild(el("b", null, name));
+    s.appendChild(document.createTextNode(fmt(value)));
+    return s;
+  }
 
+  /* ---------------- editor ---------------- */
   var dlg = $("#editor");
   var editing = null;
 
@@ -332,19 +308,19 @@
     label.value = v.label || "";
     label.setAttribute("data-f", "label");
 
-    var k = el("input", "who-k");
+    var k = el("input");
     k.type = "number"; k.step = "0.25"; k.min = "0"; k.max = "10";
     k.inputMode = "decimal"; k.placeholder = "–";
     k.value = v.k == null ? "" : v.k;
     k.setAttribute("data-f", "k");
 
-    var p = el("input", "who-p");
+    var p = el("input");
     p.type = "number"; p.step = "0.25"; p.min = "0"; p.max = "10";
     p.inputMode = "decimal"; p.placeholder = "–";
     p.value = v.p == null ? "" : v.p;
     p.setAttribute("data-f", "p");
 
-    var del = el("button", "del-visit", "✕");
+    var del = el("button", "del", "✕");
     del.type = "button";
     del.title = "Remove this visit";
     del.addEventListener("click", function () {
@@ -430,7 +406,7 @@
         renderChips();
         render();
         closeEditor();
-        showToast(isNew ? "Added " + saved.name + " 🎉" : "Saved changes");
+        showToast(isNew ? "Added " + saved.name : "Saved changes");
       })
       .catch(function () { showToast("Couldn't save — try again", true); })
       .finally(function () { btn.disabled = false; });
