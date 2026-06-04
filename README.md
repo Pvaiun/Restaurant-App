@@ -8,53 +8,50 @@ A little web app to catalogue the restaurants you've visited, grouped **by cuisi
 - **Re-visits** — log multiple visits per restaurant (e.g. a `2025` re-visit). The newest visit drives the headline K/P scores, and the overall score averages everything.
 - **Search, group & sort** — group by cuisine or city, sort by score / name / recency, filter by cuisine, full-text search.
 
-Your data lives in **Cloudflare D1** when deployed. Until then (or if you just open the file locally), it falls back to this browser's storage so it always works.
+It runs as a **Cloudflare Worker** that serves the static site and a small JSON API
+backed by **Cloudflare D1**. Until D1 is connected (or if you just open the file
+locally), it falls back to the browser's own storage so it always works.
 
 ---
 
-## Quick look (no deploy)
+## Deploy from your phone (no computer needed)
 
-Open `public/index.html` in a browser. It loads the full seeded list and saves any edits to your browser's `localStorage`. The badge in the top-right shows **● This device**.
+1. Push this repo to GitHub (already done if you're reading this there).
+2. Go to **dash.cloudflare.com** → **Workers & Pages** → **Create** → **Import a repository**.
+3. Pick the `restaurant-app` repo and the branch `claude/restaurant-rating-app-vfDwT`.
+4. Leave the build command as the default (`npx wrangler deploy`) and click **Deploy**.
 
-> Note: changes in local mode stay on that one device/browser. Deploy to Cloudflare (below) to sync everywhere and back up the data.
+You'll get a URL like `kp-restaurants.<you>.workers.dev`. Open it on your phone —
+the full list is there. The badge in the corner reads **● This device**, meaning
+edits are saved in that browser only.
 
-## Deploy to Cloudflare (Pages + D1)
+### Turn on cloud sync (data saved on Cloudflare, shared across devices)
 
-You'll need a free [Cloudflare account](https://dash.cloudflare.com/sign-up) and Node installed.
+1. Dashboard → **Storage & Databases → D1** → **Create database**, name it
+   **`kp-restaurants`**. Copy the **Database ID** it shows.
+2. Edit **`wrangler.toml`** (GitHub's web editor works fine on a phone): uncomment
+   the `[[d1_databases]]` block at the bottom and paste your Database ID.
+3. Commit — Cloudflare auto-redeploys. The table creates and seeds itself on first
+   load, the badge switches to **☁ Cloudflare**, and every device shares the data.
+
+---
+
+## Deploy / develop from a computer (optional)
 
 ```bash
-# 1. Install the CLI and log in
 npm install
 npx wrangler login
 
-# 2. Create the D1 database, then paste the printed database_id into wrangler.toml
+# create the D1 database, paste the printed id into wrangler.toml (uncomment the block)
 npm run db:create
-#   -> copy "database_id" into the [[d1_databases]] block of wrangler.toml
 
-# 3. Create the table + load your restaurants into the REMOTE database
-npm run db:schema:remote
-npm run db:seed:remote
-
-# 4. Deploy the site (static files in /public + the API in /functions)
-npm run deploy
+npm run deploy            # live on *.workers.dev
+# or
+npm run dev               # local dev server with the API
 ```
 
-Then, in the Cloudflare dashboard, open your new Pages project →
-**Settings → Functions → D1 database bindings** and add a binding named
-**`DB`** pointing at the `kp-restaurants` database. Re-deploy if needed.
-Once live, the badge reads **☁ Cloudflare** and every device shares the same data.
-
-### Run it locally with the real D1 backend
-
-```bash
-npm run db:create        # if you haven't already (creates a local DB too)
-npm run db:schema        # local schema
-npm run db:seed          # local seed
-npm run dev              # serves http://localhost:8788 with the Functions API
-```
-
-(The API also auto-creates the table and seeds it on first request, so steps
-`db:schema`/`db:seed` are optional belt-and-suspenders.)
+The API auto-creates and seeds the table on first request. To load the seed
+manually instead: `npm run db:seed:remote`.
 
 ---
 
@@ -77,8 +74,8 @@ Each restaurant:
 ```
 
 - `k` = Kayla's score, `p` = Paul's score (0–10).
-- `visits` is ordered oldest → newest. Add a visit (with an optional label like
-  a year) instead of overwriting, to keep the history.
+- `visits` is ordered oldest → newest. Add a visit (with an optional label like a
+  year) instead of overwriting, to keep the history.
 
 ## Editing the seed list
 
@@ -86,7 +83,7 @@ The starter list lives in `tools/gen-seed.mjs` (raw text + a cuisine lookup).
 After changing it, regenerate the derived files:
 
 ```bash
-npm run gen   # rewrites public/seed-data.js, functions/_seeddata.js, seed.sql
+npm run gen   # rewrites public/seed-data.js, src/seeddata.js, seed.sql
 ```
 
 > Cuisines were auto-assigned as a best guess — a few may be off (e.g. `Lali's`).
@@ -95,18 +92,17 @@ npm run gen   # rewrites public/seed-data.js, functions/_seeddata.js, seed.sql
 ## Project layout
 
 ```
-public/            Static site (served by Cloudflare Pages)
+public/            Static site (served by the Worker's asset binding)
   index.html
   styles.css
   app.js           Frontend logic + API client w/ localStorage fallback
   seed-data.js     Bundled starter data (generated)
-functions/         Cloudflare Pages Functions (the API)
-  _db.js           D1 helpers (schema, seed, sanitise, upsert)
-  _seeddata.js     Seed data for the API (generated)
-  api/restaurants/index.js   GET list / POST create
-  api/restaurants/[id].js    GET / PUT / DELETE one
+src/               The Cloudflare Worker
+  index.js         Router: /api/* -> D1, everything else -> static assets
+  db.js            D1 helpers (schema, seed, sanitise, upsert)
+  seeddata.js      Seed data for the API (generated)
 tools/gen-seed.mjs Generator for the seed files
 schema.sql         D1 table definition
 seed.sql           D1 seed inserts (generated)
-wrangler.toml      Cloudflare config (set your database_id here)
+wrangler.toml      Cloudflare config (uncomment the D1 block to enable sync)
 ```

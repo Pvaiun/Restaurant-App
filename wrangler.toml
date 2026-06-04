@@ -1,12 +1,22 @@
 name = "kp-restaurants"
+main = "src/index.js"
 compatibility_date = "2024-09-23"
-pages_build_output_dir = "public"
 
-# Cloudflare D1 database binding. After you create the database with
-#   wrangler d1 create kp-restaurants
-# paste the returned database_id below (and in the Pages dashboard, bind a D1
-# database named "DB" to this project for production).
-[[d1_databases]]
-binding = "DB"
-database_name = "kp-restaurants"
-database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
+# Static site (index.html, app.js, styles.css, seed-data.js) is served from /public.
+# The Worker only handles /api/* requests; everything else is an asset.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# --- Cloud data storage (optional, enables cross-device sync) ---------------
+# Until this is set up, the app still works and saves data in each browser.
+# To turn on Cloudflare-hosted data:
+#   1. Dashboard -> Storage & Databases -> D1 -> Create database "kp-restaurants"
+#      (copy the Database ID it shows you).
+#   2. Uncomment the block below and paste the ID.
+#   3. Commit/push (or redeploy) — the table seeds itself on first load.
+#
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "kp-restaurants"
+# database_id = "PASTE_YOUR_DATABASE_ID_HERE"

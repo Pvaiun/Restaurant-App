@@ -1,5 +1,5 @@
-// Shared helpers for the Cloudflare Pages Functions API (D1-backed).
-import { SEED } from "./_seeddata.js";
+// D1 helpers for the K&P Restaurant Catalogue Worker.
+import { SEED } from "./seeddata.js";
 
 export function json(data, status) {
   return new Response(JSON.stringify(data), {
