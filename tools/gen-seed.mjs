@@ -274,8 +274,9 @@ function parse(raw) {
     }
     if (cur.scores.length) visits.push(cur);
 
+    // Visits carry a month+year date ("YYYY-MM"), seeded later from the CSV.
     const visitObjs = visits.map((v) => ({
-      label: v.label,
+      date: "",
       k: v.scores[0] ?? null,
       p: v.scores[1] ?? null,
     }));

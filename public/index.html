@@ -18,22 +18,30 @@
         <h1>Kayla &amp; Paul</h1>
         <p class="tagline">Places we've eaten</p>
       </div>
-      <button id="addBtn" class="btn btn-accent">Add</button>
+      <div class="top-actions">
+        <button id="manageCuisinesBtn" class="btn btn-ghost" title="Add or remove cuisines">Cuisines</button>
+        <button id="addBtn" class="btn btn-accent">Add</button>
+      </div>
     </div>
   </header>
 
   <div class="controls">
-    <div class="wrap controls-inner">
+    <div class="wrap controls-row">
       <input id="search" class="search" type="search" placeholder="Search" autocomplete="off" />
-      <select id="sortBy" class="sort" aria-label="Sort by">
-        <option value="avg-desc">Top rated</option>
-        <option value="avg-asc">Lowest rated</option>
-        <option value="name-asc">A–Z</option>
-        <option value="recent">Newest</option>
-      </select>
+      <button id="sortDateBtn" class="btn btn-sort" data-active="true">Newest ↓</button>
+    </div>
+    <div class="wrap tools-row">
+      <button id="filterCuisineBtn" class="btn btn-filter">Cuisines</button>
+      <button id="filterCityBtn" class="btn btn-filter">Cities</button>
+      <span class="tools-spacer"></span>
+      <button id="clearFiltersBtn" class="btn btn-link-quiet" hidden>Clear filters</button>
     </div>
     <div class="wrap">
-      <div id="cuisineChips" class="chips" role="tablist" aria-label="Filter by cuisine"></div>
+      <div class="list-head">
+        <button class="lh lh-name" id="sortName" type="button">Name <span class="arrow"></span></button>
+        <button class="lh lh-score" id="sortKayla" type="button">Kayla <span class="arrow"></span></button>
+        <button class="lh lh-score" id="sortPaul" type="button">Paul <span class="arrow"></span></button>
+      </div>
     </div>
   </div>
 
@@ -46,7 +54,34 @@
     <span id="syncBadge" class="sync-badge"></span>
   </footer>
 
-  <!-- Detail view (tap a row) -->
+  <!-- Reusable filter dialog (cuisines / cities) -->
+  <dialog id="filterDialog" class="sheet">
+    <header class="sheet-head">
+      <h2 id="filterTitle">Filter</h2>
+      <button type="button" class="x" id="closeFilter" aria-label="Close">✕</button>
+    </header>
+    <div class="pill-grid" id="pillGrid"></div>
+    <footer class="sheet-foot">
+      <button type="button" class="btn btn-accent" id="filterDone">Done</button>
+    </footer>
+  </dialog>
+
+  <!-- Manage cuisines dialog -->
+  <dialog id="manageDialog" class="sheet">
+    <header class="sheet-head">
+      <h2>Cuisines</h2>
+      <button type="button" class="x" id="closeManage" aria-label="Close">✕</button>
+    </header>
+    <div class="manage-body">
+      <form id="addCuisineForm" class="add-cuisine">
+        <input id="newCuisine" placeholder="New cuisine (e.g. Spanish)" maxlength="60" />
+        <button type="submit" class="btn btn-accent">Add</button>
+      </form>
+      <ul id="cuisineMgrList" class="cuisine-mgr"></ul>
+    </div>
+  </dialog>
+
+  <!-- Detail view -->
   <dialog id="detail" class="sheet">
     <button type="button" class="x sheet-x" id="closeDetail" aria-label="Close">✕</button>
     <div class="sheet-body" id="detailBody"></div>
@@ -63,41 +98,35 @@
         <h2 id="editorTitle">Add a place</h2>
         <button type="button" class="x" id="closeEditor" aria-label="Close">✕</button>
       </header>
-
       <div class="editor-body">
         <label class="field">
           <span class="field-label">Name</span>
           <input id="f-name" required maxlength="120" placeholder="What's it called?" />
         </label>
-
         <div class="field-row">
           <label class="field">
             <span class="field-label">Cuisine</span>
-            <input id="f-cuisine" list="cuisineList" placeholder="e.g. Japanese" />
-            <datalist id="cuisineList"></datalist>
+            <select id="f-cuisine" class="select"></select>
           </label>
           <label class="field">
             <span class="field-label">City / area</span>
             <input id="f-city" placeholder="Montreal" />
           </label>
         </div>
-
         <fieldset class="ratings">
           <legend class="field-label">Ratings <span class="muted">/ 10</span></legend>
           <div class="ratings-head">
-            <span></span><span>Kayla</span><span>Paul</span><span></span>
+            <span>Month</span><span>Kayla</span><span>Paul</span><span></span>
           </div>
           <div id="visitsList" class="visits-list"></div>
           <button type="button" class="btn btn-quiet btn-sm" id="addVisitBtn">+ Add another visit</button>
-          <p class="hint">Been back? Add a new visit (with a year) to keep the old score too.</p>
+          <p class="hint">Been back? Add another visit with its month so you keep the history.</p>
         </fieldset>
-
         <label class="field">
           <span class="field-label">Notes</span>
           <textarea id="f-comment" rows="3" maxlength="2000" placeholder="What to order, the vibe…"></textarea>
         </label>
       </div>
-
       <footer class="editor-foot">
         <button type="button" class="btn btn-link-danger" id="deleteBtn" hidden>Delete</button>
         <span class="spacer"></span>
