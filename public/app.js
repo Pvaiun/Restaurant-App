@@ -2,8 +2,8 @@
  *
  * Data layer: talks to the Cloudflare D1-backed API at /api/restaurants when it
  * is reachable. If the API is unavailable (e.g. opened straight from disk, or
- * before you've deployed the backend), it transparently falls back to the
- * browser's localStorage, seeded from seed-data.js, so the app is always usable.
+ * before you've connected the D1 database), it transparently falls back to the
+ * browser's localStorage, seeded from seed-data.js, so the app always works.
  */
 (function () {
   "use strict";
@@ -14,9 +14,8 @@
     items: [],
     mode: "loading", // "cloud" | "local"
     search: "",
-    groupBy: "cuisine",
     sortBy: "avg-desc",
-    cuisine: "",
+    cuisine: "", // "" = all (grouped by cuisine); otherwise a single cuisine
   };
 
   /* ---------------- helpers ---------------- */
@@ -28,9 +27,7 @@
     if (text != null) e.textContent = text;
     return e;
   }
-  function uid() {
-    return "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  }
+  function uid() { return "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function num(v) {
     if (v === "" || v == null) return null;
@@ -38,7 +35,7 @@
     return isFinite(n) ? n : null;
   }
 
-  // Average of all per-person scores across every visit (the "combined" score).
+  // Average of all per-person scores across every visit (the "overall" score).
   function combinedAvg(r) {
     var vals = [];
     (r.visits || []).forEach(function (v) {
@@ -48,7 +45,6 @@
     if (!vals.length) return null;
     return vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
   }
-  // The most recent visit (last in the list) drives the headline K / P pills.
   function latestVisit(r) {
     var vs = r.visits || [];
     return vs.length ? vs[vs.length - 1] : null;
@@ -56,6 +52,13 @@
   function fmt(n) {
     if (n == null) return "–";
     return Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/0$/, "");
+  }
+  function tierClass(avg) {
+    if (avg == null) return "tier-none";
+    if (avg >= 8.5) return "tier-top";
+    if (avg >= 7) return "tier-good";
+    if (avg >= 5.5) return "tier-mid";
+    return "tier-low";
   }
   function mapsUrl(r) {
     var q = encodeURIComponent([r.name, r.city].filter(Boolean).join(", "));
@@ -69,7 +72,6 @@
       var raw = localStorage.getItem(LS_KEY);
       if (raw) return JSON.parse(raw);
     } catch (e) { /* ignore */ }
-    // First run: seed from bundled data.
     var seed = (window.SEED_DATA || []).map(clone);
     saveLocal(seed);
     return seed;
@@ -79,7 +81,7 @@
   }
 
   function init() {
-    fetch(API, { headers: { "accept": "application/json" } })
+    fetch(API, { headers: { accept: "application/json" } })
       .then(function (res) {
         if (!res.ok) throw new Error("api " + res.status);
         return res.json();
@@ -96,7 +98,6 @@
       });
   }
 
-  // Persist a single restaurant (create or update).
   function persist(item, isNew) {
     if (state.mode === "cloud") {
       var url = isNew ? API : API + "/" + encodeURIComponent(item.id);
@@ -109,7 +110,6 @@
         return res.json();
       });
     }
-    // local
     var idx = state.items.findIndex(function (r) { return r.id === item.id; });
     if (idx >= 0) state.items[idx] = item; else state.items.push(item);
     saveLocal(state.items);
@@ -131,63 +131,84 @@
   function afterLoad() {
     var badge = $("#syncBadge");
     if (state.mode === "cloud") {
-      badge.textContent = "☁ Cloudflare";
+      badge.textContent = "☁ Synced";
       badge.className = "sync-badge cloud";
-      badge.title = "Synced to your Cloudflare D1 database";
+      badge.title = "Saved to your Cloudflare database and shared across devices";
     } else {
-      badge.textContent = "● This device";
-      badge.className = "sync-badge local";
-      badge.title = "Stored in this browser. Deploy the Cloudflare backend to sync across devices.";
+      badge.textContent = "● Saved on this device";
+      badge.className = "sync-badge";
+      badge.title = "Connect the Cloudflare database to sync across devices";
     }
-    refreshCuisineControls();
+    renderChips();
     render();
   }
 
-  function cuisines() {
-    var set = {};
-    state.items.forEach(function (r) { if (r.cuisine) set[r.cuisine] = true; });
-    return Object.keys(set).sort();
+  function cuisineCounts() {
+    var counts = {};
+    state.items.forEach(function (r) {
+      var c = r.cuisine || "Other";
+      counts[c] = (counts[c] || 0) + 1;
+    });
+    return counts;
   }
 
-  function refreshCuisineControls() {
-    var list = cuisines();
-    var sel = $("#cuisineFilter");
-    var prev = sel.value;
-    sel.innerHTML = '<option value="">All</option>';
-    list.forEach(function (c) {
-      var o = el("option", null, c);
-      o.value = c;
-      sel.appendChild(o);
-    });
-    sel.value = list.indexOf(prev) >= 0 ? prev : "";
+  function renderChips() {
+    var wrap = $("#cuisineChips");
+    wrap.innerHTML = "";
+    var counts = cuisineCounts();
+    var names = Object.keys(counts).sort(function (a, b) { return a.localeCompare(b); });
+
+    wrap.appendChild(makeChip("", "All", state.items.length));
+    names.forEach(function (c) { wrap.appendChild(makeChip(c, c, counts[c])); });
+
+    // keep the datalist (editor autocomplete) in sync
     var dl = $("#cuisineList");
     dl.innerHTML = "";
-    list.forEach(function (c) {
+    names.forEach(function (c) {
       var o = document.createElement("option");
       o.value = c;
       dl.appendChild(o);
     });
   }
 
+  function makeChip(value, label, count) {
+    var b = el("button", "chip-btn" + (state.cuisine === value ? " active" : ""));
+    b.type = "button";
+    b.appendChild(document.createTextNode(label));
+    var c = el("span", "chip-count", String(count));
+    b.appendChild(c);
+    b.addEventListener("click", function () {
+      state.cuisine = state.cuisine === value ? "" : value;
+      renderChips();
+      render();
+      // scroll the active chip into view
+      var active = $("#cuisineChips .chip-btn.active");
+      if (active && active.scrollIntoView) active.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+    });
+    return b;
+  }
+
   function visibleItems() {
     var q = state.search.trim().toLowerCase();
     var items = state.items.filter(function (r) {
-      if (state.cuisine && r.cuisine !== state.cuisine) return false;
+      if (state.cuisine && (r.cuisine || "Other") !== state.cuisine) return false;
       if (!q) return true;
       var hay = [r.name, r.cuisine, r.city, r.comment].join(" ").toLowerCase();
       return hay.indexOf(q) >= 0;
     });
-
-    items.sort(function (a, b) {
-      switch (state.sortBy) {
-        case "avg-asc": return (combinedAvg(a) ?? -1) - (combinedAvg(b) ?? -1);
-        case "name-asc": return a.name.localeCompare(b.name);
-        case "recent": return (b.sort || 0) - (a.sort || 0);
-        default: return (combinedAvg(b) ?? -1) - (combinedAvg(a) ?? -1); // avg-desc
-      }
-    });
+    items.sort(sorter);
     return items;
   }
+
+  function sorter(a, b) {
+    switch (state.sortBy) {
+      case "avg-asc": return safeAvg(a) - safeAvg(b);
+      case "name-asc": return a.name.localeCompare(b.name);
+      case "recent": return (b.sort || 0) - (a.sort || 0);
+      default: return safeAvg(b) - safeAvg(a); // avg-desc
+    }
+  }
+  function safeAvg(r) { var v = combinedAvg(r); return v == null ? -1 : v; }
 
   function render() {
     var app = $("#app");
@@ -195,26 +216,27 @@
     var items = visibleItems();
 
     $("#statLine").textContent =
-      state.items.length + " restaurants catalogued · " +
-      cuisines().length + " cuisines · " +
-      (state.mode === "cloud" ? "synced to Cloudflare" : "saved on this device");
+      state.items.length + " places · " + Object.keys(cuisineCounts()).length + " cuisines";
 
     if (!items.length) {
-      var empty = el("p", "empty-state",
-        state.items.length ? "No restaurants match your search." : "No restaurants yet. Add your first one!");
+      var empty = el("div", "empty-state");
+      empty.appendChild(el("span", "big", state.items.length ? "🔍" : "🍽️"));
+      empty.appendChild(document.createTextNode(
+        state.items.length ? "Nothing matches that — try another search." : "No places yet. Add your first one!"
+      ));
       app.appendChild(empty);
       return;
     }
 
-    if (state.groupBy === "none") {
+    // A specific cuisine selected → flat sorted list. "All" → grouped by cuisine.
+    if (state.cuisine) {
       app.appendChild(renderCards(items));
       return;
     }
 
-    var key = state.groupBy; // "cuisine" | "city"
     var groups = {};
     items.forEach(function (r) {
-      var g = r[key] || "—";
+      var g = r.cuisine || "Other";
       (groups[g] || (groups[g] = [])).push(r);
     });
     Object.keys(groups).sort(function (a, b) { return a.localeCompare(b); }).forEach(function (g) {
@@ -222,7 +244,7 @@
       var section = el("section", "group");
       var head = el("div", "group-head");
       head.appendChild(el("h2", "group-title", g));
-      head.appendChild(el("span", "group-count", rows.length + (rows.length === 1 ? " spot" : " spots")));
+      head.appendChild(el("span", "group-count", String(rows.length)));
       var avgs = rows.map(combinedAvg).filter(function (n) { return n != null; });
       if (avgs.length) {
         var ga = avgs.reduce(function (a, b) { return a + b; }, 0) / avgs.length;
@@ -240,20 +262,28 @@
     return grid;
   }
 
+  function whoScore(letter, name, value, cls) {
+    var w = el("div", "who-score " + cls);
+    w.appendChild(el("span", "who-avatar", letter));
+    w.appendChild(el("span", "who-name", name));
+    w.appendChild(el("span", null, fmt(value)));
+    return w;
+  }
+
   function renderCard(r) {
     var card = el("article", "card");
 
     var top = el("div", "card-top");
     var main = el("div", "card-main");
     main.appendChild(el("h3", "card-name", r.name));
-    var meta = el("p", "card-meta");
+    var meta = el("div", "card-meta");
     if (r.cuisine) meta.appendChild(el("span", "chip", r.cuisine));
     if (r.city) meta.appendChild(el("span", "chip city", r.city));
     main.appendChild(meta);
     top.appendChild(main);
 
     var avg = combinedAvg(r);
-    var badge = el("div", "score-badge");
+    var badge = el("div", "score-badge " + tierClass(avg));
     badge.appendChild(el("div", "score-num", avg == null ? "–" : avg.toFixed(1)));
     badge.appendChild(el("div", "score-lbl", "overall"));
     top.appendChild(badge);
@@ -261,19 +291,13 @@
 
     var last = latestVisit(r);
     var scores = el("div", "scores");
-    var kp = el("div", "score-pill k");
-    kp.appendChild(el("span", "who", "K"));
-    kp.appendChild(el("span", null, last ? fmt(last.k) : "–"));
-    var pp = el("div", "score-pill p");
-    pp.appendChild(el("span", "who", "P"));
-    pp.appendChild(el("span", null, last ? fmt(last.p) : "–"));
-    scores.appendChild(kp);
-    scores.appendChild(pp);
+    scores.appendChild(whoScore("K", "Kayla", last ? last.k : null, "k"));
+    scores.appendChild(whoScore("P", "Paul", last ? last.p : null, "p"));
     card.appendChild(scores);
 
     if ((r.visits || []).length > 1) {
       var lbl = last && last.label ? last.label : "latest visit";
-      card.appendChild(el("p", "visit-note", "Showing " + lbl + " · " + r.visits.length + " visits logged"));
+      card.appendChild(el("p", "visit-note", "Showing " + lbl + " · " + r.visits.length + " visits"));
     } else if (last && last.label) {
       card.appendChild(el("p", "visit-note", last.label));
     }
@@ -281,11 +305,11 @@
     if (r.comment) card.appendChild(el("p", "card-comment", r.comment));
 
     var actions = el("div", "card-actions");
-    var maps = el("a", "btn btn-maps", "📍 Maps");
+    var maps = el("a", "btn btn-maps", "📍 Map");
     maps.href = mapsUrl(r);
     maps.target = "_blank";
     maps.rel = "noopener";
-    var edit = el("button", "btn btn-ghost", "✎ Edit");
+    var edit = el("button", "btn btn-edit", "✎ Edit");
     edit.addEventListener("click", function () { openEditor(r); });
     actions.appendChild(maps);
     actions.appendChild(edit);
@@ -297,25 +321,27 @@
   /* ---------------- editor ---------------- */
 
   var dlg = $("#editor");
-  var editing = null; // current restaurant id, or null for new
+  var editing = null;
 
   function visitRow(v) {
     v = v || { label: "", k: "", p: "" };
     var row = el("div", "visit-row");
 
-    var label = el("input");
-    label.placeholder = "Label (e.g. 2025, 1st visit)";
+    var label = el("input", "label-input");
+    label.placeholder = "Visit (e.g. 2025)";
     label.value = v.label || "";
     label.setAttribute("data-f", "label");
 
     var k = el("input", "who-k");
     k.type = "number"; k.step = "0.25"; k.min = "0"; k.max = "10";
-    k.placeholder = "K"; k.value = v.k == null ? "" : v.k;
+    k.inputMode = "decimal"; k.placeholder = "–";
+    k.value = v.k == null ? "" : v.k;
     k.setAttribute("data-f", "k");
 
     var p = el("input", "who-p");
     p.type = "number"; p.step = "0.25"; p.min = "0"; p.max = "10";
-    p.placeholder = "P"; p.value = v.p == null ? "" : v.p;
+    p.inputMode = "decimal"; p.placeholder = "–";
+    p.value = v.p == null ? "" : v.p;
     p.setAttribute("data-f", "p");
 
     var del = el("button", "del-visit", "✕");
@@ -336,7 +362,7 @@
 
   function openEditor(r) {
     editing = r ? r.id : null;
-    $("#editorTitle").textContent = r ? "Edit restaurant" : "Add restaurant";
+    $("#editorTitle").textContent = r ? "Edit place" : "Add a place";
     $("#f-name").value = r ? r.name : "";
     $("#f-cuisine").value = r ? (r.cuisine || "") : "";
     $("#f-city").value = r ? (r.city || "") : "Montreal";
@@ -364,7 +390,7 @@
       var label = $('[data-f="label"]', row).value.trim();
       var k = num($('[data-f="k"]', row).value);
       var p = num($('[data-f="p"]', row).value);
-      if (label === "" && k == null && p == null) return; // skip blank
+      if (label === "" && k == null && p == null) return;
       visits.push({ label: label, k: k, p: p });
     });
     if (!visits.length) visits.push({ label: "", k: null, p: null });
@@ -388,7 +414,7 @@
   function onSubmit(e) {
     e.preventDefault();
     var item = collectForm();
-    if (!item.name) { showToast("Please enter a name", true); return; }
+    if (!item.name) { showToast("Please add a name", true); return; }
     var isNew = !editing;
     var btn = $("#saveBtn");
     btn.disabled = true;
@@ -401,10 +427,10 @@
           var idx = state.items.findIndex(function (x) { return x.id === saved.id; });
           if (idx >= 0) state.items[idx] = saved;
         }
-        refreshCuisineControls();
+        renderChips();
         render();
         closeEditor();
-        showToast(isNew ? "Added " + saved.name : "Saved changes");
+        showToast(isNew ? "Added " + saved.name + " 🎉" : "Saved changes");
       })
       .catch(function () { showToast("Couldn't save — try again", true); })
       .finally(function () { btn.disabled = false; });
@@ -419,7 +445,8 @@
     remove(id)
       .then(function () {
         state.items = state.items.filter(function (x) { return x.id !== id; });
-        refreshCuisineControls();
+        if (state.cuisine && !cuisineCounts()[state.cuisine]) state.cuisine = "";
+        renderChips();
         render();
         closeEditor();
         showToast("Deleted " + r.name);
@@ -455,9 +482,7 @@
       clearTimeout(deb);
       deb = setTimeout(function () { state.search = searchEl.value; render(); }, 120);
     });
-    $("#groupBy").addEventListener("change", function (e) { state.groupBy = e.target.value; render(); });
     $("#sortBy").addEventListener("change", function (e) { state.sortBy = e.target.value; render(); });
-    $("#cuisineFilter").addEventListener("change", function (e) { state.cuisine = e.target.value; render(); });
   }
 
   bind();
