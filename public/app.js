@@ -474,17 +474,40 @@
   }
   function optionEl(value, label) { var o = document.createElement("option"); o.value = value; o.textContent = label; return o; }
 
-  // Offer the neighbourhoods already in use as type-ahead suggestions.
-  function buildAreaSuggestions() {
-    var dl = $("#areaOptions"); if (!dl) return;
-    dl.innerHTML = "";
+  // Distinct neighbourhoods already used across the catalogue, sorted.
+  var NBHD_NEW = "__add_new__";   // sentinel value for the "Add new…" option
+  function neighbourhoodNames() {
     var seen = {};
     state.items.forEach(function (r) {
-      var a = r.neighbourhood && r.neighbourhood.trim();
-      if (a && !seen[a]) { seen[a] = true; }
+      var a = r.neighbourhood && String(r.neighbourhood).trim();
+      if (a) seen[a] = true;
     });
-    Object.keys(seen).sort(function (a, b) { return a.localeCompare(b); })
-      .forEach(function (a) { dl.appendChild(optionEl(a, a)); });
+    return Object.keys(seen).sort(function (a, b) { return a.localeCompare(b); });
+  }
+  // Build the editor's neighbourhood dropdown: None + existing ones + "Add new…".
+  function buildNeighbourhoodSelect(selected) {
+    var sel = $("#f-neighbourhood"); sel.innerHTML = "";
+    sel.appendChild(optionEl("", "— None —"));
+    var list = neighbourhoodNames();
+    if (selected && list.indexOf(selected) < 0) list.push(selected); // keep a one-off existing value
+    list.sort(function (a, b) { return a.localeCompare(b); });
+    list.forEach(function (a) { sel.appendChild(optionEl(a, a)); });
+    sel.appendChild(optionEl(NBHD_NEW, "＋ Add new…"));
+    sel.value = selected || "";
+    $("#f-neighbourhood-new").value = "";
+    toggleNewNeighbourhood();
+  }
+  // Show the free-text box only when "Add new…" is picked.
+  function toggleNewNeighbourhood() {
+    var isNew = $("#f-neighbourhood").value === NBHD_NEW;
+    var inp = $("#f-neighbourhood-new");
+    inp.hidden = !isNew;
+    if (isNew) setTimeout(function () { inp.focus(); }, 30);
+  }
+  function currentNeighbourhood() {
+    var sel = $("#f-neighbourhood");
+    if (sel.value === NBHD_NEW) return $("#f-neighbourhood-new").value.trim();
+    return sel.value.trim();
   }
 
   function visitRow(v) {
@@ -512,8 +535,7 @@
     $("#f-name").value = r ? r.name : "";
     buildCuisineSelect(r ? categoryOf(r) : "");
     $("#f-city").value = r ? (r.city || "") : "Montreal";
-    $("#f-neighbourhood").value = r ? (r.neighbourhood || "") : "";
-    buildAreaSuggestions();
+    buildNeighbourhoodSelect(r ? (r.neighbourhood || "") : "");
     $("#f-comment").value = r ? (r.comment || "") : "";
     var list = $("#visitsList"); list.innerHTML = "";
     var visits = (r && r.visits && r.visits.length) ? r.visits : [{ date: currentMonth(), k: "", p: "" }];
@@ -539,7 +561,7 @@
       name: $("#f-name").value.trim(),
       cuisine: $("#f-cuisine").value.trim(),
       city: $("#f-city").value.trim(),
-      neighbourhood: $("#f-neighbourhood").value.trim(),
+      neighbourhood: currentNeighbourhood(),
       comment: $("#f-comment").value.trim(),
       visits: visits,
       sort: existing ? existing.sort : (maxSort() + 1),
@@ -829,6 +851,7 @@
     $("#addBtn").addEventListener("click", function () { openEditor(null); });
     $("#manageCuisinesBtn").addEventListener("click", openManage);
     $("#addVisitBtn").addEventListener("click", function () { $("#visitsList").appendChild(visitRow()); });
+    $("#f-neighbourhood").addEventListener("change", toggleNewNeighbourhood);
     $("#editorForm").addEventListener("submit", onSubmit);
     $("#cancelBtn").addEventListener("click", function () { closeDialog(dlg); });
     $("#closeEditor").addEventListener("click", function () { closeDialog(dlg); });
