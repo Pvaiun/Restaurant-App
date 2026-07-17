@@ -83,10 +83,30 @@
     return Object.keys(set).sort(function (a, b) { return a.localeCompare(b); });
   }
   function loadLocalItems() {
-    try { var raw = localStorage.getItem(LS_ITEMS); if (raw) return JSON.parse(raw); } catch (e) {}
+    try {
+      var raw = localStorage.getItem(LS_ITEMS);
+      if (raw) return backfillLocalNeighbourhoods(JSON.parse(raw));
+    } catch (e) {}
     var seed = (window.SEED_DATA || []).map(clone);
     saveLocalItems(seed);
     return seed;
+  }
+  // One-time: copy seed neighbourhoods onto cached items saved before the field
+  // existed. Fills blanks only, so user-entered neighbourhoods are preserved.
+  function backfillLocalNeighbourhoods(items) {
+    try { if (localStorage.getItem("kp_nbhd_backfill_v1")) return items; } catch (e) { return items; }
+    var seedById = {};
+    (window.SEED_DATA || []).forEach(function (s) { seedById[s.id] = s; });
+    var changed = false;
+    items.forEach(function (r) {
+      if (!(r.neighbourhood && String(r.neighbourhood).trim())) {
+        var s = seedById[r.id];
+        if (s && s.neighbourhood) { r.neighbourhood = s.neighbourhood; changed = true; }
+      }
+    });
+    if (changed) saveLocalItems(items);
+    try { localStorage.setItem("kp_nbhd_backfill_v1", "1"); } catch (e) {}
+    return items;
   }
   function saveLocalItems(items) { try { localStorage.setItem(LS_ITEMS, JSON.stringify(items)); } catch (e) {} }
   function loadLocalCuisines() {

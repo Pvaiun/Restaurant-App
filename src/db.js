@@ -102,6 +102,29 @@ export async function ensureReady(db) {
 
   await db.prepare("CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT)").run();
   await backfillDates(db);
+  await backfillNeighbourhoods(db);
+}
+
+// One-time: copy the SEED's neighbourhoods onto existing rows that don't have
+// one yet (databases seeded before the neighbourhood field existed). Only fills
+// blanks, so it never clobbers a neighbourhood a user has set themselves.
+async function backfillNeighbourhoods(db) {
+  const done = await db.prepare("SELECT v FROM meta WHERE k = 'seed_neighbourhoods'").first();
+  if (done) return;
+
+  const seedById = {};
+  for (const s of SEED) seedById[s.id] = s;
+  const { results } = await db.prepare("SELECT id, neighbourhood FROM restaurants").all();
+  const stmts = [];
+  for (const row of results || []) {
+    const seed = seedById[row.id];
+    if (!seed || !seed.neighbourhood) continue;
+    if (!(row.neighbourhood || "").trim()) {
+      stmts.push(db.prepare("UPDATE restaurants SET neighbourhood = ? WHERE id = ?").bind(seed.neighbourhood, row.id));
+    }
+  }
+  if (stmts.length) await db.batch(stmts);
+  await db.prepare("INSERT OR REPLACE INTO meta (k, v) VALUES ('seed_neighbourhoods', '1')").run();
 }
 
 // One-time: copy the SEED's placeholder visit dates onto any existing rows whose
