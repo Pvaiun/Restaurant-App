@@ -23,6 +23,7 @@ export function rowToObj(row) {
     name: row.name,
     cuisine: row.cuisine || "",
     city: row.city || "",
+    neighbourhood: row.neighbourhood || "",
     comment: row.comment || "",
     visits: visits,
     sort: row.sort || 0,
@@ -43,6 +44,7 @@ export function sanitize(input, id, fallbackSort) {
     name: String((input && input.name) || "").slice(0, 120).trim(),
     cuisine: String((input && input.cuisine) || "").slice(0, 60).trim(),
     city: String((input && input.city) || "").slice(0, 80).trim(),
+    neighbourhood: String((input && input.neighbourhood) || "").slice(0, 80).trim(),
     comment: String((input && input.comment) || "").slice(0, 2000),
     visits: cleanVisits,
     sort: Number.isFinite(input && input.sort) ? input.sort : fallbackSort,
@@ -66,9 +68,12 @@ export async function ensureReady(db) {
   await db.prepare(
     `CREATE TABLE IF NOT EXISTS restaurants (
       id TEXT PRIMARY KEY, name TEXT NOT NULL, cuisine TEXT, city TEXT,
-      comment TEXT, visits TEXT, sort INTEGER DEFAULT 0, updated_at INTEGER DEFAULT 0
+      neighbourhood TEXT, comment TEXT, visits TEXT, sort INTEGER DEFAULT 0,
+      updated_at INTEGER DEFAULT 0
     )`
   ).run();
+  // Migration: add the neighbourhood column to databases created before it existed.
+  await ensureColumn(db, "restaurants", "neighbourhood", "TEXT");
   await db.prepare(
     `CREATE TABLE IF NOT EXISTS cuisines (
       name TEXT PRIMARY KEY COLLATE NOCASE, sort INTEGER DEFAULT 0
@@ -80,9 +85,9 @@ export async function ensureReady(db) {
     const now = Date.now();
     const stmts = SEED.map((x) =>
       db.prepare(
-        `INSERT INTO restaurants (id, name, cuisine, city, comment, visits, sort, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-      ).bind(x.id, x.name, x.cuisine, x.city, x.comment, JSON.stringify(x.visits), x.sort, now)
+        `INSERT INTO restaurants (id, name, cuisine, city, neighbourhood, comment, visits, sort, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ).bind(x.id, x.name, x.cuisine, x.city, x.neighbourhood || "", x.comment, JSON.stringify(x.visits), x.sort, now)
     );
     if (stmts.length) await db.batch(stmts);
   }
@@ -129,14 +134,22 @@ async function backfillDates(db) {
 
 export async function upsert(db, r) {
   await db.prepare(
-    `INSERT INTO restaurants (id, name, cuisine, city, comment, visits, sort, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO restaurants (id, name, cuisine, city, neighbourhood, comment, visits, sort, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET
        name=excluded.name, cuisine=excluded.cuisine, city=excluded.city,
-       comment=excluded.comment, visits=excluded.visits, sort=excluded.sort,
-       updated_at=excluded.updated_at`
-  ).bind(r.id, r.name, r.cuisine, r.city, r.comment, JSON.stringify(r.visits), r.sort, Date.now()).run();
+       neighbourhood=excluded.neighbourhood, comment=excluded.comment,
+       visits=excluded.visits, sort=excluded.sort, updated_at=excluded.updated_at`
+  ).bind(r.id, r.name, r.cuisine, r.city, r.neighbourhood || "", r.comment, JSON.stringify(r.visits), r.sort, Date.now()).run();
   return r;
+}
+
+// Add a column to a table if it isn't already present (SQLite lacks
+// "ADD COLUMN IF NOT EXISTS"), so migrations stay idempotent.
+async function ensureColumn(db, table, column, type) {
+  const info = await db.prepare(`PRAGMA table_info(${table})`).all();
+  const has = (info.results || []).some((c) => c.name === column);
+  if (!has) await db.prepare(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`).run();
 }
 
 export async function listCuisines(db) {

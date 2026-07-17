@@ -38,6 +38,7 @@
     sort: { key: "date", dir: "desc" }, // default: newest
     exCuisine: new Set(),               // excluded cuisines (empty = all shown)
     exCity: new Set(),                  // excluded cities
+    exArea: new Set(),                  // excluded neighbourhoods
   };
 
   /* ---------------- helpers ---------------- */
@@ -68,6 +69,7 @@
     return "https://www.google.com/maps/search/?api=1&query=" + q;
   }
   function cityOf(r) { return r.city || "—"; }
+  function neighbourhoodOf(r) { return (r.neighbourhood && r.neighbourhood.trim()) || "—"; }
 
   /* ---------------- data layer ---------------- */
   function dataCuisines() {
@@ -161,6 +163,11 @@
     state.items.forEach(function (r) { var k = cityOf(r); c[k] = (c[k] || 0) + 1; });
     return c;
   }
+  function areaCounts() {
+    var c = {};
+    state.items.forEach(function (r) { var k = neighbourhoodOf(r); c[k] = (c[k] || 0) + 1; });
+    return c;
+  }
 
   /* ---------------- rendering ---------------- */
   function afterLoad() {
@@ -189,8 +196,9 @@
     var items = state.items.filter(function (r) {
       if (state.exCuisine.has(categoryOf(r))) return false;
       if (state.exCity.has(cityOf(r))) return false;
+      if (state.exArea.has(neighbourhoodOf(r))) return false;
       if (!q) return true;
-      return [r.name, categoryOf(r), r.city, r.comment].join(" ").toLowerCase().indexOf(q) >= 0;
+      return [r.name, categoryOf(r), r.city, r.neighbourhood, r.comment].join(" ").toLowerCase().indexOf(q) >= 0;
     });
     items.sort(compare);
     return items;
@@ -237,6 +245,7 @@
     main.appendChild(el("span", "row-name", r.name));
     var meta = el("span", "row-meta");
     var parts = [categoryOf(r)];
+    if (r.neighbourhood && r.neighbourhood.trim()) parts.push(r.neighbourhood.trim());
     if (r.city && r.city !== "Montreal") parts.push(r.city);
     var d = fmtMonth(latestDate(r));
     if (d) parts.push(d);
@@ -285,15 +294,24 @@
 
   function openFilter(kind) {
     filterKind = kind;
-    $("#filterTitle").textContent = kind === "cuisine" ? "Show cuisines" : "Show cities";
+    var titles = { cuisine: "Show cuisines", city: "Show cities", area: "Show neighbourhoods" };
+    $("#filterTitle").textContent = titles[kind] || "Filter";
     buildPills();
     openDialog(filterDlg);
   }
   function filterValues() {
-    var counts = filterKind === "cuisine" ? cuisineCounts() : cityCounts();
-    return { counts: counts, names: Object.keys(counts).sort(function (a, b) { return a.localeCompare(b); }) };
+    var counts = filterKind === "cuisine" ? cuisineCounts() : filterKind === "area" ? areaCounts() : cityCounts();
+    return { counts: counts, names: Object.keys(counts).sort(sortAreaNames) };
   }
-  function excludedSet() { return filterKind === "cuisine" ? state.exCuisine : state.exCity; }
+  // Sort filter names alphabetically, but always push the "—" (unset) bucket last.
+  function sortAreaNames(a, b) {
+    if (a === "—") return 1;
+    if (b === "—") return -1;
+    return a.localeCompare(b);
+  }
+  function excludedSet() {
+    return filterKind === "cuisine" ? state.exCuisine : filterKind === "area" ? state.exArea : state.exCity;
+  }
 
   function buildPills() {
     var grid = $("#pillGrid"); grid.innerHTML = "";
@@ -327,7 +345,8 @@
   function updateFilterBadges() {
     badge($("#filterCuisineBtn"), "Cuisines", cuisineCounts(), state.exCuisine);
     badge($("#filterCityBtn"), "Cities", cityCounts(), state.exCity);
-    var any = state.exCuisine.size > 0 || state.exCity.size > 0;
+    badge($("#filterAreaBtn"), "Areas", areaCounts(), state.exArea);
+    var any = state.exCuisine.size > 0 || state.exCity.size > 0 || state.exArea.size > 0;
     $("#clearFiltersBtn").hidden = !any;
   }
   function badge(btn, label, counts, ex) {
@@ -337,7 +356,7 @@
     btn.classList.toggle("filtered", active > 0);
     btn.textContent = active > 0 ? label + " · " + shown : label;
   }
-  function clearFilters() { state.exCuisine.clear(); state.exCity.clear(); updateFilterBadges(); render(); }
+  function clearFilters() { state.exCuisine.clear(); state.exCity.clear(); state.exArea.clear(); updateFilterBadges(); render(); }
 
   /* ---------------- manage cuisines ---------------- */
   var manageDlg = $("#manageDialog");
@@ -387,6 +406,7 @@
     body.appendChild(el("h2", "detail-name", r.name));
     var sub = el("p", "detail-sub");
     var parts = [categoryOf(r)];
+    if (r.neighbourhood && r.neighbourhood.trim()) parts.push(r.neighbourhood.trim());
     if (r.city) parts.push(r.city);
     parts.forEach(function (p, i) { if (i) sub.appendChild(el("span", "dot", "·")); sub.appendChild(document.createTextNode(p)); });
     body.appendChild(sub);
@@ -434,6 +454,19 @@
   }
   function optionEl(value, label) { var o = document.createElement("option"); o.value = value; o.textContent = label; return o; }
 
+  // Offer the neighbourhoods already in use as type-ahead suggestions.
+  function buildAreaSuggestions() {
+    var dl = $("#areaOptions"); if (!dl) return;
+    dl.innerHTML = "";
+    var seen = {};
+    state.items.forEach(function (r) {
+      var a = r.neighbourhood && r.neighbourhood.trim();
+      if (a && !seen[a]) { seen[a] = true; }
+    });
+    Object.keys(seen).sort(function (a, b) { return a.localeCompare(b); })
+      .forEach(function (a) { dl.appendChild(optionEl(a, a)); });
+  }
+
   function visitRow(v) {
     v = v || { date: currentMonth(), k: "", p: "" };
     var row = el("div", "visit-row");
@@ -459,6 +492,8 @@
     $("#f-name").value = r ? r.name : "";
     buildCuisineSelect(r ? categoryOf(r) : "");
     $("#f-city").value = r ? (r.city || "") : "Montreal";
+    $("#f-neighbourhood").value = r ? (r.neighbourhood || "") : "";
+    buildAreaSuggestions();
     $("#f-comment").value = r ? (r.comment || "") : "";
     var list = $("#visitsList"); list.innerHTML = "";
     var visits = (r && r.visits && r.visits.length) ? r.visits : [{ date: currentMonth(), k: "", p: "" }];
@@ -484,6 +519,7 @@
       name: $("#f-name").value.trim(),
       cuisine: $("#f-cuisine").value.trim(),
       city: $("#f-city").value.trim(),
+      neighbourhood: $("#f-neighbourhood").value.trim(),
       comment: $("#f-comment").value.trim(),
       visits: visits,
       sort: existing ? existing.sort : (maxSort() + 1),
@@ -732,6 +768,24 @@
         return { name: x.city, sub: x.n + " place" + (x.n === 1 ? "" : "s"), right: el("div", "rank-score", "avg " + round1(x.avg)) };
       }))));
 
+    // --- neighbourhoods (only places that have one set) ---
+    var byArea = {};
+    items.forEach(function (r) {
+      var a = r.neighbourhood && r.neighbourhood.trim();
+      if (!a) return;
+      var m = rMean(r, "both");
+      if (!byArea[a]) byArea[a] = { n: 0, s: [] };
+      byArea[a].n++; if (m != null) byArea[a].s.push(m);
+    });
+    var areaRows = Object.keys(byArea).map(function (a) { return { area: a, n: byArea[a].n, avg: mean(byArea[a].s) }; })
+      .sort(function (a, b) { return b.n - a.n; });
+    if (areaRows.length) {
+      box.appendChild(card("By neighbourhood", "Places per neighbourhood, with average rating",
+        rankList(areaRows.map(function (x) {
+          return { name: x.area, sub: x.n + " place" + (x.n === 1 ? "" : "s"), right: el("div", "rank-score", "avg " + round1(x.avg)) };
+        }))));
+    }
+
     // --- score distribution ---
     var bins = [{ l: "Under 5", lo: 0, hi: 5 }, { l: "5–6", lo: 5, hi: 6 }, { l: "6–7", lo: 6, hi: 7 },
       { l: "7–8", lo: 7, hi: 8 }, { l: "8–9", lo: 8, hi: 9 }, { l: "9–10", lo: 9, hi: 10.01 }];
@@ -768,6 +822,7 @@
 
     $("#filterCuisineBtn").addEventListener("click", function () { openFilter("cuisine"); });
     $("#filterCityBtn").addEventListener("click", function () { openFilter("city"); });
+    $("#filterAreaBtn").addEventListener("click", function () { openFilter("area"); });
     $("#clearFiltersBtn").addEventListener("click", clearFilters);
     $("#closeFilter").addEventListener("click", function () { closeDialog(filterDlg); });
     $("#filterDone").addEventListener("click", function () { closeDialog(filterDlg); });

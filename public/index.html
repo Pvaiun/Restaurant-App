@@ -40,6 +40,7 @@
     <div class="wrap tools-row">
       <button id="filterCuisineBtn" class="btn btn-filter">Cuisines</button>
       <button id="filterCityBtn" class="btn btn-filter">Cities</button>
+      <button id="filterAreaBtn" class="btn btn-filter">Areas</button>
       <span class="tools-spacer"></span>
       <button id="clearFiltersBtn" class="btn btn-link-quiet" hidden>Clear filters</button>
     </div>
@@ -118,10 +119,15 @@
             <select id="f-cuisine" class="select"></select>
           </label>
           <label class="field">
-            <span class="field-label">City / area</span>
+            <span class="field-label">City</span>
             <input id="f-city" placeholder="Montreal" />
           </label>
         </div>
+        <label class="field">
+          <span class="field-label">Neighbourhood <span class="muted">(optional)</span></span>
+          <input id="f-neighbourhood" list="areaOptions" placeholder="e.g. Plateau-Mont-Royal" maxlength="80" />
+          <datalist id="areaOptions"></datalist>
+        </label>
         <fieldset class="ratings">
           <legend class="field-label">Ratings <span class="muted">/ 10</span></legend>
           <div class="ratings-head">
