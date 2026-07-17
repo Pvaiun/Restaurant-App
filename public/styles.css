@@ -201,6 +201,7 @@ button, input, select, textarea { font-family: inherit; }
 .muted { color: var(--ink-faint); font-weight: 400; }
 .field input, .field textarea, .select { font-size: 15px; color: var(--ink); padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: #fff; resize: vertical; width: 100%; }
 .select { cursor: pointer; }
+.nbhd-new { margin-top: 8px; }
 .field input::placeholder, .field textarea::placeholder { color: var(--ink-faint); }
 .field-row { display: flex; gap: 12px; }
 .field-row .field { flex: 1; }
