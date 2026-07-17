@@ -5,6 +5,7 @@ export const SEED = [
     "name": "Le Nile Bleu",
     "cuisine": "Ethiopian",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -20,6 +21,7 @@ export const SEED = [
     "name": "Picks",
     "cuisine": "Canadian & Comfort",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -35,6 +37,7 @@ export const SEED = [
     "name": "Bistro Tôt ou Tard",
     "cuisine": "French",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -50,6 +53,7 @@ export const SEED = [
     "name": "Kagayaki",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Chinatown",
     "comment": "",
     "visits": [
       {
@@ -65,6 +69,7 @@ export const SEED = [
     "name": "Sushi Momo",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -80,6 +85,7 @@ export const SEED = [
     "name": "Tacos Tin Tan",
     "cuisine": "Mexican",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -95,6 +101,7 @@ export const SEED = [
     "name": "Le P'tit Rustik",
     "cuisine": "French",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -115,6 +122,7 @@ export const SEED = [
     "name": "Pho Nguyen",
     "cuisine": "Vietnamese",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -130,6 +138,7 @@ export const SEED = [
     "name": "Dandy",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Old Montreal",
     "comment": "",
     "visits": [
       {
@@ -145,6 +154,7 @@ export const SEED = [
     "name": "Le Toaster",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Villeray",
     "comment": "",
     "visits": [
       {
@@ -160,6 +170,7 @@ export const SEED = [
     "name": "Le Mekong",
     "cuisine": "Vietnamese",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -175,6 +186,7 @@ export const SEED = [
     "name": "Muru Crêpes",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Old Montreal",
     "comment": "",
     "visits": [
       {
@@ -190,6 +202,7 @@ export const SEED = [
     "name": "India Rosa Griffintown",
     "cuisine": "Indian",
     "city": "Montreal",
+    "neighbourhood": "Griffintown",
     "comment": "",
     "visits": [
       {
@@ -205,6 +218,7 @@ export const SEED = [
     "name": "L'Gros Luxe",
     "cuisine": "Canadian & Comfort",
     "city": "Montreal",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -220,6 +234,7 @@ export const SEED = [
     "name": "Chef Lee",
     "cuisine": "Korean",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -235,6 +250,7 @@ export const SEED = [
     "name": "Pho Saigon Vietnam",
     "cuisine": "Vietnamese",
     "city": "Montreal",
+    "neighbourhood": "Chinatown",
     "comment": "",
     "visits": [
       {
@@ -250,6 +266,7 @@ export const SEED = [
     "name": "Resto Végo",
     "cuisine": "Canadian & Comfort",
     "city": "Montreal",
+    "neighbourhood": "Quartier Latin",
     "comment": "",
     "visits": [
       {
@@ -265,6 +282,7 @@ export const SEED = [
     "name": "Bun Mam Ninh Kieu",
     "cuisine": "Vietnamese",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -280,6 +298,7 @@ export const SEED = [
     "name": "3 Brasseurs",
     "cuisine": "French",
     "city": "Montreal",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -295,6 +314,7 @@ export const SEED = [
     "name": "Restaurant Coréen Luna",
     "cuisine": "Korean",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -310,6 +330,7 @@ export const SEED = [
     "name": "Tsukuyomi Ramen Crescent",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -325,6 +346,7 @@ export const SEED = [
     "name": "Ramen cubby hole",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -340,6 +362,7 @@ export const SEED = [
     "name": "Jako",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -355,6 +378,7 @@ export const SEED = [
     "name": "Omnivore",
     "cuisine": "Middle Eastern",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -370,6 +394,7 @@ export const SEED = [
     "name": "Nouilles Yunan",
     "cuisine": "Chinese",
     "city": "Montreal",
+    "neighbourhood": "Chinatown",
     "comment": "",
     "visits": [
       {
@@ -385,6 +410,7 @@ export const SEED = [
     "name": "Icehouse",
     "cuisine": "Mexican",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -400,6 +426,7 @@ export const SEED = [
     "name": "Chu Chai",
     "cuisine": "Thai",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -415,6 +442,7 @@ export const SEED = [
     "name": "Nos The",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -430,6 +458,7 @@ export const SEED = [
     "name": "Ginko",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Quartier Latin",
     "comment": "",
     "visits": [
       {
@@ -445,6 +474,7 @@ export const SEED = [
     "name": "Bvrger",
     "cuisine": "Canadian & Comfort",
     "city": "Montreal",
+    "neighbourhood": "Old Montreal",
     "comment": "",
     "visits": [
       {
@@ -460,6 +490,7 @@ export const SEED = [
     "name": "Mimosa café",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -475,6 +506,7 @@ export const SEED = [
     "name": "Yokato Yokabai",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -490,6 +522,7 @@ export const SEED = [
     "name": "Shushu Thai",
     "cuisine": "Thai",
     "city": "Montreal",
+    "neighbourhood": "Little Burgundy",
     "comment": "",
     "visits": [
       {
@@ -505,6 +538,7 @@ export const SEED = [
     "name": "Sunny Dinette",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Saint-Henri",
     "comment": "",
     "visits": [
       {
@@ -520,6 +554,7 @@ export const SEED = [
     "name": "Maison v.i.p",
     "cuisine": "Chinese",
     "city": "Montreal",
+    "neighbourhood": "Chinatown",
     "comment": "",
     "visits": [
       {
@@ -535,6 +570,7 @@ export const SEED = [
     "name": "Ches's",
     "cuisine": "Canadian & Comfort",
     "city": "Montreal",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -550,6 +586,7 @@ export const SEED = [
     "name": "Sun Sushi",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -565,6 +602,7 @@ export const SEED = [
     "name": "Mallard Cottage",
     "cuisine": "Canadian & Comfort",
     "city": "Montreal",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -580,6 +618,7 @@ export const SEED = [
     "name": "Bazar Café",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "La Petite-Patrie",
     "comment": "",
     "visits": [
       {
@@ -595,6 +634,7 @@ export const SEED = [
     "name": "Queen Sheba",
     "cuisine": "Ethiopian",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -610,6 +650,7 @@ export const SEED = [
     "name": "Desi Indian",
     "cuisine": "Indian",
     "city": "Montreal",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -625,6 +666,7 @@ export const SEED = [
     "name": "Shushu Ramen",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Pointe-Saint-Charles",
     "comment": "",
     "visits": [
       {
@@ -640,6 +682,7 @@ export const SEED = [
     "name": "Moa Moa",
     "cuisine": "Korean",
     "city": "Montreal",
+    "neighbourhood": "Verdun",
     "comment": "",
     "visits": [
       {
@@ -655,6 +698,7 @@ export const SEED = [
     "name": "Escondite Drummond",
     "cuisine": "Mexican",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -670,6 +714,7 @@ export const SEED = [
     "name": "Kim Galbi",
     "cuisine": "Korean",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "8.5 level food, but big portions and v expensive",
     "visits": [
       {
@@ -685,6 +730,7 @@ export const SEED = [
     "name": "Au Pain Perdu",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -700,6 +746,7 @@ export const SEED = [
     "name": "Burgundy Lion",
     "cuisine": "Canadian & Comfort",
     "city": "Montreal",
+    "neighbourhood": "Little Burgundy",
     "comment": "",
     "visits": [
       {
@@ -715,6 +762,7 @@ export const SEED = [
     "name": "Haidalio hot pot",
     "cuisine": "Chinese",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -730,6 +778,7 @@ export const SEED = [
     "name": "Bagel etc",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -745,6 +794,7 @@ export const SEED = [
     "name": "Le Petit Saigon",
     "cuisine": "Vietnamese",
     "city": "Victoria, BC",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -760,6 +810,7 @@ export const SEED = [
     "name": "JAM Cafe",
     "cuisine": "Brunch",
     "city": "Vancouver",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -775,6 +826,7 @@ export const SEED = [
     "name": "Bvrger Fiancé",
     "cuisine": "Canadian & Comfort",
     "city": "Montreal",
+    "neighbourhood": "Old Montreal",
     "comment": "",
     "visits": [
       {
@@ -790,6 +842,7 @@ export const SEED = [
     "name": "MONO",
     "cuisine": "Korean",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -805,6 +858,7 @@ export const SEED = [
     "name": "Bloom Sushi",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -820,6 +874,7 @@ export const SEED = [
     "name": "Rendez-vous Bistro Indien",
     "cuisine": "Indian",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -835,6 +890,7 @@ export const SEED = [
     "name": "Kiodai Izakaya",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -850,6 +906,7 @@ export const SEED = [
     "name": "Katsuya",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -865,6 +922,7 @@ export const SEED = [
     "name": "Bistro King Creole",
     "cuisine": "Caribbean",
     "city": "Montreal",
+    "neighbourhood": "Hochelaga-Maisonneuve",
     "comment": "",
     "visits": [
       {
@@ -880,6 +938,7 @@ export const SEED = [
     "name": "Greenspot",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Saint-Henri",
     "comment": "",
     "visits": [
       {
@@ -895,6 +954,7 @@ export const SEED = [
     "name": "Trattoria Trestevere",
     "cuisine": "Italian",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -910,6 +970,7 @@ export const SEED = [
     "name": "Dobe & Andy",
     "cuisine": "Chinese",
     "city": "Montreal",
+    "neighbourhood": "Chinatown",
     "comment": "",
     "visits": [
       {
@@ -925,6 +986,7 @@ export const SEED = [
     "name": "L'Oeufrier",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -940,6 +1002,7 @@ export const SEED = [
     "name": "Lulu Épicerie",
     "cuisine": "Middle Eastern",
     "city": "Montreal",
+    "neighbourhood": "Little Burgundy",
     "comment": "",
     "visits": [
       {
@@ -955,6 +1018,7 @@ export const SEED = [
     "name": "Lali's",
     "cuisine": "Indian",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -970,6 +1034,7 @@ export const SEED = [
     "name": "Kinton Ramen Westmount",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Westmount",
     "comment": "",
     "visits": [
       {
@@ -985,6 +1050,7 @@ export const SEED = [
     "name": "Foeigwa Brunch",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Saint-Henri",
     "comment": "",
     "visits": [
       {
@@ -1000,6 +1066,7 @@ export const SEED = [
     "name": "Quoi de neuf",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Little Burgundy",
     "comment": "",
     "visits": [
       {
@@ -1015,6 +1082,7 @@ export const SEED = [
     "name": "Louis Pizza",
     "cuisine": "Italian",
     "city": "Ottawa",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -1030,6 +1098,7 @@ export const SEED = [
     "name": "Zak's",
     "cuisine": "Brunch",
     "city": "Ottawa",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -1045,6 +1114,7 @@ export const SEED = [
     "name": "Garden Room",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -1060,6 +1130,7 @@ export const SEED = [
     "name": "Shawarma Palace",
     "cuisine": "Middle Eastern",
     "city": "Ottawa",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -1075,6 +1146,7 @@ export const SEED = [
     "name": "Souvlaki Grec Plus",
     "cuisine": "Middle Eastern",
     "city": "Montreal",
+    "neighbourhood": "Saint-Henri",
     "comment": "",
     "visits": [
       {
@@ -1090,6 +1162,7 @@ export const SEED = [
     "name": "Bismillah Poulet Grillé Cuisine Indienne",
     "cuisine": "Indian",
     "city": "Montreal",
+    "neighbourhood": "Little Burgundy",
     "comment": "",
     "visits": [
       {
@@ -1105,6 +1178,7 @@ export const SEED = [
     "name": "Aqua E Farina",
     "cuisine": "Italian",
     "city": "Montreal",
+    "neighbourhood": "Notre-Dame-de-Grâce",
     "comment": "",
     "visits": [
       {
@@ -1120,6 +1194,7 @@ export const SEED = [
     "name": "Joyo Burger Wellington",
     "cuisine": "Canadian & Comfort",
     "city": "Montreal",
+    "neighbourhood": "Verdun",
     "comment": "",
     "visits": [
       {
@@ -1135,6 +1210,7 @@ export const SEED = [
     "name": "The Sparrow",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Mile End",
     "comment": "",
     "visits": [
       {
@@ -1150,6 +1226,7 @@ export const SEED = [
     "name": "Luyishou Fondue",
     "cuisine": "Chinese",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -1165,6 +1242,7 @@ export const SEED = [
     "name": "House of Taste",
     "cuisine": "Middle Eastern",
     "city": "Montreal",
+    "neighbourhood": "Lachine",
     "comment": "",
     "visits": [
       {
@@ -1180,6 +1258,7 @@ export const SEED = [
     "name": "Millmans",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Verdun",
     "comment": "",
     "visits": [
       {
@@ -1195,6 +1274,7 @@ export const SEED = [
     "name": "Neotokyo",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
@@ -1210,6 +1290,7 @@ export const SEED = [
     "name": "The Big R",
     "cuisine": "Brunch",
     "city": "Newfoundland",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -1225,6 +1306,7 @@ export const SEED = [
     "name": "Dock Marina",
     "cuisine": "Canadian & Comfort",
     "city": "Newfoundland",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -1240,6 +1322,7 @@ export const SEED = [
     "name": "Skippers",
     "cuisine": "Canadian & Comfort",
     "city": "Newfoundland",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -1255,6 +1338,7 @@ export const SEED = [
     "name": "Lovely Grand",
     "cuisine": "Canadian & Comfort",
     "city": "Newfoundland",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -1270,6 +1354,7 @@ export const SEED = [
     "name": "Quintal Cafe",
     "cuisine": "Brunch",
     "city": "Newfoundland",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -1285,6 +1370,7 @@ export const SEED = [
     "name": "Annie's in Twillingate",
     "cuisine": "Canadian & Comfort",
     "city": "Newfoundland",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -1300,6 +1386,7 @@ export const SEED = [
     "name": "Ma Poule Mouillée",
     "cuisine": "Caribbean",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -1315,6 +1402,7 @@ export const SEED = [
     "name": "Kinton Ramen Square Victoria",
     "cuisine": "Japanese",
     "city": "Montreal",
+    "neighbourhood": "Old Montreal",
     "comment": "",
     "visits": [
       {
@@ -1330,6 +1418,7 @@ export const SEED = [
     "name": "Sammi Soup Dumpling",
     "cuisine": "Chinese",
     "city": "Montreal",
+    "neighbourhood": "Chinatown",
     "comment": "",
     "visits": [
       {
@@ -1345,6 +1434,7 @@ export const SEED = [
     "name": "Tacos Lakalaka",
     "cuisine": "Mexican",
     "city": "Montreal",
+    "neighbourhood": "Hochelaga-Maisonneuve",
     "comment": "",
     "visits": [
       {
@@ -1360,6 +1450,7 @@ export const SEED = [
     "name": "3 Madames",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "Verdun",
     "comment": "",
     "visits": [
       {
@@ -1375,6 +1466,7 @@ export const SEED = [
     "name": "Le Petit Dek Sen",
     "cuisine": "Thai",
     "city": "Montreal",
+    "neighbourhood": "Notre-Dame-de-Grâce",
     "comment": "",
     "visits": [
       {
@@ -1390,6 +1482,7 @@ export const SEED = [
     "name": "Siwalee",
     "cuisine": "Thai",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -1405,6 +1498,7 @@ export const SEED = [
     "name": "Harbin St Denis",
     "cuisine": "Chinese",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -1420,6 +1514,7 @@ export const SEED = [
     "name": "Cora",
     "cuisine": "Brunch",
     "city": "Montreal",
+    "neighbourhood": "",
     "comment": "",
     "visits": [
       {
@@ -1435,6 +1530,7 @@ export const SEED = [
     "name": "Pho Ahn Express",
     "cuisine": "Vietnamese",
     "city": "Montreal",
+    "neighbourhood": "Plateau-Mont-Royal",
     "comment": "",
     "visits": [
       {
@@ -1450,6 +1546,7 @@ export const SEED = [
     "name": "Escondite Union",
     "cuisine": "Mexican",
     "city": "Montreal",
+    "neighbourhood": "Downtown (Ville-Marie)",
     "comment": "",
     "visits": [
       {
